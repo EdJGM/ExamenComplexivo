@@ -31,12 +31,19 @@
                     <div class="mb-3">
                         <label for="director_id" class="form-label">Director de Carrera <span class="text-danger">*</span></label>
                         <select wire:model="director_id" id="director_id" name="director_id"
-                            class="form-select @error('director_id') is-invalid @enderror">
+                            class="form-select @error('director_id') is-invalid @enderror" @if($users_filtrados->isEmpty()) disabled @endif>
                             <option value="">--Elija Director de Carrera--</option>
-                            @foreach ($users->sortBy('name') as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
+                            @if($users_filtrados->isNotEmpty())
+                                @foreach ($users_filtrados->sortBy('name') as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} @if($user->departamento) ({{ $user->departamento->nombre }}) @endif</option>
+                                @endforeach
+                            @endif
                         </select>
+                        @if($carrera_id && $users_filtrados->isEmpty())
+                            <small class="text-warning">No hay docentes disponibles del departamento de esta carrera</small>
+                        @elseif(!$carrera_id)
+                            <small class="text-muted">Primero seleccione una carrera</small>
+                        @endif
                         @error('director_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -45,14 +52,21 @@
                     <div class="mb-3">
                         <label for="docente_apoyo_id" class="form-label">Docente de Apoyo</label>
                         <select wire:model="docente_apoyo_id" id="docente_apoyo_id" name="docente_apoyo_id"
-                            class="form-select @error('docente_apoyo_id') is-invalid @enderror">
+                            class="form-select @error('docente_apoyo_id') is-invalid @enderror" @if($users_filtrados->isEmpty()) disabled @endif>
                             <option value="">--Elija Docente de Apoyo--</option>
-                            @foreach ($users->sortBy('name') as $user)
-                                @if ($user->id != $director_id)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endif
-                            @endforeach
+                            @if($users_filtrados->isNotEmpty())
+                                @foreach ($users_filtrados->sortBy('name') as $user)
+                                    @if ($user->id != $director_id)
+                                        <option value="{{ $user->id }}">{{ $user->name }} @if($user->departamento) ({{ $user->departamento->nombre }}) @endif</option>
+                                    @endif
+                                @endforeach
+                            @endif
                         </select>
+                        @if($carrera_id && $users_filtrados->isEmpty())
+                            <small class="text-warning">No hay docentes disponibles del departamento de esta carrera</small>
+                        @elseif(!$carrera_id)
+                            <small class="text-muted">Primero seleccione una carrera</small>
+                        @endif
                         @error('docente_apoyo_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -97,12 +111,19 @@
                     <div class="mb-3">
                         <label for="director_id_edit" class="form-label">Director de Carrera <span class="text-danger">*</span></label>
                         <select wire:model="director_id" id="director_id_edit" name="director_id"
-                            class="form-select @error('director_id') is-invalid @enderror">
+                            class="form-select @error('director_id') is-invalid @enderror" @if($users_filtrados->isEmpty()) disabled @endif>
                             <option value="">--Elija Director de Carrera--</option>
-                            @foreach ($users->sortBy('name') as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
+                            @if($users_filtrados->isNotEmpty())
+                                @foreach ($users_filtrados->sortBy('name') as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} @if($user->departamento) ({{ $user->departamento->nombre }}) @endif</option>
+                                @endforeach
+                            @endif
                         </select>
+                        @if($carrera_id && $users_filtrados->isEmpty())
+                            <small class="text-warning">No hay docentes disponibles del departamento de esta carrera</small>
+                        @elseif(!$carrera_id)
+                            <small class="text-muted">Primero seleccione una carrera</small>
+                        @endif
                         @error('director_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -111,14 +132,21 @@
                     <div class="mb-3">
                         <label for="docente_apoyo_id_edit" class="form-label">Docente de Apoyo</label>
                         <select wire:model="docente_apoyo_id" id="docente_apoyo_id_edit" name="docente_apoyo_id"
-                            class="form-select @error('docente_apoyo_id') is-invalid @enderror">
+                            class="form-select @error('docente_apoyo_id') is-invalid @enderror" @if($users_filtrados->isEmpty()) disabled @endif>
                             <option value="">--Elija Docente de Apoyo--</option>
-                            @foreach ($users->sortBy('name') as $user)
-                                @if ($user->id != $director_id)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endif
-                            @endforeach
+                            @if($users_filtrados->isNotEmpty())
+                                @foreach ($users_filtrados->sortBy('name') as $user)
+                                    @if ($user->id != $director_id)
+                                        <option value="{{ $user->id }}">{{ $user->name }} @if($user->departamento) ({{ $user->departamento->nombre }}) @endif</option>
+                                    @endif
+                                @endforeach
+                            @endif
                         </select>
+                        @if($carrera_id && $users_filtrados->isEmpty())
+                            <small class="text-warning">No hay docentes disponibles del departamento de esta carrera</small>
+                        @elseif(!$carrera_id)
+                            <small class="text-muted">Primero seleccione una carrera</small>
+                        @endif
                         @error('docente_apoyo_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
