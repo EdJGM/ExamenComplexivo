@@ -20,12 +20,15 @@ class Users extends Component
 
     protected $paginationTheme = 'bootstrap';
     public $selected_id, $keyWord, $name, $email, $password, $password_confirmation;
+    public $departamento_id; // Departamento al que pertenece el docente
     public $usuarioFounded;
     public $archivoExcelProfesores;
     public $importing = false;
     public $importFinished = false;
     public $importErrors = [];
     public $perPage = 13; // NUEVO
+    public $departamentosDisponibles = []; // Para poblar el selector
+    public $departamento_filter = ''; // Filtro por departamento en la vista
 
     protected function rules()
     {
@@ -58,6 +61,15 @@ class Users extends Component
     public function mount()
     {
         $this->verificarAccesoUsuarios();
+        $this->cargarDepartamentosDisponibles();
+    }
+
+    /**
+     * Cargar departamentos disponibles para el selector
+     */
+    private function cargarDepartamentosDisponibles()
+    {
+        $this->departamentosDisponibles = \App\Models\Departamento::orderBy('nombre')->get();
     }
 
     /**
@@ -105,6 +117,19 @@ class Users extends Component
                 ->orWhere('name', 'LIKE', $keyWord)
                 ->orWhere('email', 'LIKE', $keyWord);
         })
+            ->when($this->departamento_filter, function ($query) {
+                $query->where('departamento_id', $this->departamento_filter);
+            })
+            ->with([
+                'carrerasComoDirector.carrera',
+                'carrerasComoDirector.periodo',
+                'carrerasComoApoyo.carrera',
+                'carrerasComoApoyo.periodo',
+                'asignacionesCalificadorGeneral.carreraPeriodo.carrera',
+                'asignacionesCalificadorGeneral.carreraPeriodo.periodo',
+                'miembrosTribunales.tribunal.carrerasPeriodo.carrera',
+                'miembrosTribunales.tribunal.carrerasPeriodo.periodo'
+            ])
             ->paginate($this->perPage);
 
         return view('livewire.users.view', compact('users'));
@@ -121,6 +146,7 @@ class Users extends Component
         $this->email = null;
         $this->password = null;
         $this->password_confirmation = null;
+        $this->departamento_id = null;
     }
 
     public function store()
@@ -138,6 +164,7 @@ class Users extends Component
             $user->name = $this->name;
             $user->email = $this->email;
             $user->password = Hash::make($this->password);
+            $user->departamento_id = $this->departamento_id; // Opcional: solo para docentes
             $user->save();
 
             $this->resetInput();
@@ -265,7 +292,8 @@ class Users extends Component
         $this->importErrors = [];
 
         try {
-            $import = new ProfesoresImport();
+            // Pasar departamento_id al importador
+            $import = new ProfesoresImport($this->departamento_id);
             Excel::import($import, $this->archivoExcelProfesores->getRealPath());
 
             if ($import->failures()->isNotEmpty()) {
@@ -274,7 +302,8 @@ class Users extends Component
                 }
                 session()->flash('warning', 'La importación finalizó, pero algunas filas tenían errores y no se importaron.');
             } else {
-                session()->flash('success', 'Importación de profesores completada exitosamente.');
+                $departamentoMsg = $this->departamento_id ? ' al departamento seleccionado' : '';
+                session()->flash('success', 'Importación de profesores completada exitosamente' . $departamentoMsg . '.');
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Error durante la importación: ' . $e->getMessage());
