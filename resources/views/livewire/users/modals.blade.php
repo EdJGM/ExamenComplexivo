@@ -30,6 +30,20 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="departamento_id" class="form-label">Departamento (Opcional)</label>
+                        <select wire:model="departamento_id" class="form-select @error('departamento_id') is-invalid @enderror" id="departamento_id">
+                            <option value="">Sin departamento asignado</option>
+                            @foreach($departamentosDisponibles as $depto)
+                                <option value="{{ $depto->id }}">{{ $depto->nombre }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Asignar departamento solo para docentes</small>
+                        @error('departamento_id')
+                            <span class="error invalid-feedback" role="alert">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
                         <input type="password" class="form-control @error('password') is-invalid @enderror"
                             wire:model="password" placeholder="***************">
@@ -137,6 +151,20 @@
             </div>
             <div class="modal-body">
                 <form wire:submit.prevent="importarProfesores">
+                    <div class="form-group mb-3">
+                        <label for="departamento_id_import" class="form-label">Departamento (Opcional)</label>
+                        <select wire:model="departamento_id" class="form-select @error('departamento_id') is-invalid @enderror" id="departamento_id_import">
+                            <option value="">Sin departamento asignado</option>
+                            @foreach($departamentosDisponibles as $depto)
+                                <option value="{{ $depto->id }}">{{ $depto->nombre }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Todos los profesores importados se asignarán a este departamento</small>
+                        @error('departamento_id')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <div class="form-group mb-3">
                         <label for="archivoExcelProfesores" class="form-label">Seleccione el archivo Excel (.xlsx,
                             .xls)</label>
