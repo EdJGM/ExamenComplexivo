@@ -16,6 +16,16 @@ class ProfesoresImport implements ToCollection, WithHeadingRow, WithValidation, 
 {
     use Importable, SkipsFailures;
 
+    protected $departamento_id;
+
+    /**
+     * Constructor para recibir el departamento_id
+     */
+    public function __construct($departamento_id = null)
+    {
+        $this->departamento_id = $departamento_id;
+    }
+
     public function collection(Collection $rows)
     {
         //dd($rows);
@@ -44,6 +54,7 @@ class ProfesoresImport implements ToCollection, WithHeadingRow, WithValidation, 
                     'cedula'    => trim($row['cedula']),
                     'password'  => Hash::make(trim($row['cedula'])), // La cédula como contraseña
                     'email_verified_at' => now(), // Marcar como verificado por defecto
+                    'departamento_id' => $this->departamento_id, // Asignar departamento si fue proporcionado
                 ]
             );
 
