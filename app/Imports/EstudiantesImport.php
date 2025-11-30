@@ -17,6 +17,16 @@ class EstudiantesImport implements ToModel, WithHeadingRow, WithValidation, Skip
 {
     use Importable, SkipsFailures;
 
+    protected $carrera_periodo_id;
+
+    /**
+     * Constructor para recibir el carrera_periodo_id
+     */
+    public function __construct($carrera_periodo_id)
+    {
+        $this->carrera_periodo_id = $carrera_periodo_id;
+    }
+
     /**
      * @param array $row
      *
@@ -64,6 +74,7 @@ class EstudiantesImport implements ToModel, WithHeadingRow, WithValidation, Skip
                 'correo'        => trim($row[$keyCorreo]),
                 'username'      => $this->generarUsername($row[$keyCorreo] ?? null),
                 'telefono'      => null,
+                'carrera_periodo_id' => $this->carrera_periodo_id, // Asignar carrera-periodo
             ]
         );
     }
