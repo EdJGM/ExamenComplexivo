@@ -17,6 +17,7 @@ class Profile extends Component
     public $periodos_carreras;
     public $carreras;
     public $users;
+    public $users_filtrados; // Usuarios filtrados por departamento de la carrera seleccionada
     public $carrera_id, $director_id, $docente_apoyo_id;
     public $selected_id;
     public $founded;
@@ -36,6 +37,41 @@ class Profile extends Component
             $query->whereIn('name', $rolesExcluidosEdicion);
         })
             ->orderBy('name')->get();
+
+        // Inicializar usuarios filtrados vacío
+        $this->users_filtrados = collect();
+    }
+
+    /**
+     * Ejecutar cuando cambia la carrera seleccionada
+     * Filtrar usuarios por departamento de la carrera
+     */
+    public function updatedCarreraId($value)
+    {
+        if ($value) {
+            $carrera = Carrera::find($value);
+
+            if ($carrera && $carrera->departamento_id) {
+                // Filtrar usuarios que pertenecen al mismo departamento que la carrera
+                $rolesExcluidosEdicion = ['Super Admin', 'Administrador'];
+                $this->users_filtrados = User::where('departamento_id', $carrera->departamento_id)
+                    ->whereDoesntHave('roles', function ($query) use ($rolesExcluidosEdicion) {
+                        $query->whereIn('name', $rolesExcluidosEdicion);
+                    })
+                    ->orderBy('name')
+                    ->get();
+            } else {
+                // Si la carrera no tiene departamento, mostrar todos los docentes
+                $this->users_filtrados = $this->users;
+            }
+        } else {
+            // Si no hay carrera seleccionada, vaciar usuarios filtrados
+            $this->users_filtrados = collect();
+        }
+
+        // Resetear director y apoyo al cambiar carrera
+        $this->director_id = null;
+        $this->docente_apoyo_id = null;
     }
 
     private function verificarAccesoAlPeriodo()
