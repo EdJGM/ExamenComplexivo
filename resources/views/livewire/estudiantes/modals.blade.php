@@ -9,12 +9,24 @@
             </div>
            <div class="modal-body">
 				<form>
+                    <div class="form-group mb-3">
+                        <label for="carrera_periodo_id">Carrera y Periodo <span class="text-danger">*</span></label>
+                        <select wire:model="carrera_periodo_id" class="form-select @error('carrera_periodo_id') is-invalid @enderror" id="carrera_periodo_id">
+                            <option value="">Seleccione carrera y periodo</option>
+                            @foreach($carrerasPeriodosDisponibles as $cp)
+                                <option value="{{ $cp->id }}">
+                                    {{ $cp->carrera->nombre ?? 'N/A' }} - {{ $cp->periodo->codigo_periodo ?? 'N/A' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('carrera_periodo_id') <span class="error text-danger">{{ $message }}</span> @enderror
+                    </div>
                     <div class="form-group">
-                        <label for="nombres"></label>
+                        <label for="nombres">Nombres</label>
                         <input wire:model="nombres" type="text" class="form-control" id="nombres" placeholder="Nombres">@error('nombres') <span class="error text-danger">{{ $message }}</span> @enderror
                     </div>
                     <div class="form-group">
-                        <label for="apellidos"></label>
+                        <label for="apellidos">Apellidos</label>
                         <input wire:model="apellidos" type="text" class="form-control" id="apellidos" placeholder="Apellidos">@error('apellidos') <span class="error text-danger">{{ $message }}</span> @enderror
                     </div>
                     <div class="form-group">
@@ -60,6 +72,18 @@
             <div class="modal-body">
                 <form>
 					<input type="hidden" wire:model="selected_id">
+                    <div class="form-group mb-3">
+                        <label for="carrera_periodo_id_edit">Carrera y Periodo <span class="text-danger">*</span></label>
+                        <select wire:model="carrera_periodo_id" class="form-select @error('carrera_periodo_id') is-invalid @enderror" id="carrera_periodo_id_edit">
+                            <option value="">Seleccione carrera y periodo</option>
+                            @foreach($carrerasPeriodosDisponibles as $cp)
+                                <option value="{{ $cp->id }}">
+                                    {{ $cp->carrera->nombre ?? 'N/A' }} - {{ $cp->periodo->codigo_periodo ?? 'N/A' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('carrera_periodo_id') <span class="error text-danger">{{ $message }}</span> @enderror
+                    </div>
                     <div class="form-group">
                         <label for="nombres">Nombres</label>
                         <input wire:model="nombres" type="text" class="form-control" id="nombres" placeholder="Nombres">@error('nombres') <span class="error text-danger">{{ $message }}</span> @enderror
@@ -141,6 +165,20 @@
             </div>
             <div class="modal-body">
                 <form wire:submit.prevent="importarEstudiantes">
+                    <div class="form-group mb-3">
+                        <label for="carrera_periodo_id_import" class="form-label">Carrera y Periodo <span class="text-danger">*</span></label>
+                        <select wire:model="carrera_periodo_id" class="form-select @error('carrera_periodo_id') is-invalid @enderror" id="carrera_periodo_id_import">
+                            <option value="">Seleccione carrera y periodo</option>
+                            @foreach($carrerasPeriodosDisponibles as $cp)
+                                <option value="{{ $cp->id }}">
+                                    {{ $cp->carrera->nombre ?? 'N/A' }} - {{ $cp->periodo->codigo_periodo ?? 'N/A' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Todos los estudiantes importados se asignarán a esta carrera y periodo</small>
+                        @error('carrera_periodo_id') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                    </div>
+
                     <div class="form-group mb-3">
                         <label for="archivoExcel" class="form-label">Seleccione el archivo Excel (.xlsx, .xls)</label>
                         <input type="file" class="form-control @error('archivoExcel') is-invalid @enderror" id="archivoExcel" wire:model="archivoExcel">
