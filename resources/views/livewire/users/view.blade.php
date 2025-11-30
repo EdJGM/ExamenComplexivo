@@ -30,16 +30,27 @@
                             @endif
                         </div>
                     </div>
-                    <div class="mt-2 d-flex align-items-center">
-                        <label class="me-2 mb-0">Mostrar</label>
-                        <select wire:model="perPage" class="form-select form-select-sm w-auto">
-                            <option value="5">5</option>
-                            <option value="13">13</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <span class="ms-2">filas</span>
+                    <div class="mt-2 d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center">
+                            <label class="me-2 mb-0">Mostrar</label>
+                            <select wire:model="perPage" class="form-select form-select-sm w-auto">
+                                <option value="5">5</option>
+                                <option value="13">13</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="ms-2">filas</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label class="me-2 mb-0">Filtrar por departamento:</label>
+                            <select wire:model="departamento_filter" class="form-select form-select-sm w-auto">
+                                <option value="">Todos</option>
+                                @foreach($departamentosDisponibles as $depto)
+                                    <option value="{{ $depto->id }}">{{ $depto->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -52,7 +63,8 @@
                                     <td>#</td>
                                     <th>Nombre</th>
                                     <th>Correo</th>
-                                    <th>Rol</th>
+                                    <th>Rol Global</th>
+                                    <th>Asignaciones Contextuales</th>
                                     <td>ACCIONES</td>
                                 </tr>
                             </thead>
@@ -60,6 +72,66 @@
                                 @forelse($users as $row)
                                     @php
                                         $roles = $row->getRoleNames();
+
+                                        // Recolectar asignaciones contextuales
+                                        $asignaciones = [];
+
+                                        // Director de carreras
+                                        foreach($row->carrerasComoDirector as $cp) {
+                                            $asignaciones[] = [
+                                                'tipo' => 'Director',
+                                                'carrera' => $cp->carrera->nombre ?? 'N/A',
+                                                'periodo' => $cp->periodo->codigo_periodo ?? 'N/A',
+                                                'badge_class' => 'bg-primary'
+                                            ];
+                                        }
+
+                                        // Docente de apoyo
+                                        foreach($row->carrerasComoApoyo as $cp) {
+                                            $asignaciones[] = [
+                                                'tipo' => 'Docente Apoyo',
+                                                'carrera' => $cp->carrera->nombre ?? 'N/A',
+                                                'periodo' => $cp->periodo->codigo_periodo ?? 'N/A',
+                                                'badge_class' => 'bg-success'
+                                            ];
+                                        }
+
+                                        // Calificador general
+                                        foreach($row->asignacionesCalificadorGeneral as $cg) {
+                                            $asignaciones[] = [
+                                                'tipo' => 'Calificador General',
+                                                'carrera' => $cg->carreraPeriodo->carrera->nombre ?? 'N/A',
+                                                'periodo' => $cg->carreraPeriodo->periodo->codigo_periodo ?? 'N/A',
+                                                'badge_class' => 'bg-warning text-dark'
+                                            ];
+                                        }
+
+                                        // Miembros de tribunales (agrupar por carrera/periodo únicos)
+                                        $tribunalesAgrupados = [];
+                                        foreach($row->miembrosTribunales as $mt) {
+                                            if($mt->tribunal && $mt->tribunal->carrerasPeriodo) {
+                                                $cp = $mt->tribunal->carrerasPeriodo;
+                                                $key = $cp->id;
+                                                if(!isset($tribunalesAgrupados[$key])) {
+                                                    $tribunalesAgrupados[$key] = [
+                                                        'carrera' => $cp->carrera->nombre ?? 'N/A',
+                                                        'periodo' => $cp->periodo->codigo_periodo ?? 'N/A',
+                                                        'count' => 0
+                                                    ];
+                                                }
+                                                $tribunalesAgrupados[$key]['count']++;
+                                            }
+                                        }
+
+                                        foreach($tribunalesAgrupados as $tb) {
+                                            $asignaciones[] = [
+                                                'tipo' => 'Miembro Tribunal',
+                                                'carrera' => $tb['carrera'],
+                                                'periodo' => $tb['periodo'],
+                                                'count' => $tb['count'],
+                                                'badge_class' => 'bg-secondary'
+                                            ];
+                                        }
                                     @endphp
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
@@ -69,6 +141,23 @@
                                             @foreach ($roles as $rol)
                                                 <span class="badge bg-info">{{ $rol }}</span>
                                             @endforeach
+                                        </td>
+                                        <td>
+                                            @if(count($asignaciones) > 0)
+                                                <div class="d-flex flex-column gap-1">
+                                                    @foreach($asignaciones as $asig)
+                                                        <small>
+                                                            <span class="badge {{ $asig['badge_class'] }}">{{ $asig['tipo'] }}</span>
+                                                            <span class="text-muted">{{ $asig['carrera'] }} ({{ $asig['periodo'] }})</span>
+                                                            @if(isset($asig['count']))
+                                                                <span class="badge bg-dark">x{{ $asig['count'] }}</span>
+                                                            @endif
+                                                        </small>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="text-muted small">Sin asignaciones</span>
+                                            @endif
                                         </td>
                                         <td width="120">
                                             @can('gestionar usuarios')
