@@ -5,7 +5,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createDataModalLabel">Crear Nuevo Usuario</h5>
+                <h5 class="modal-title" id="createDataModalLabel">Crear Nuevo Docente</h5>
                 <button wire:click.prevent="cancel()" type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -75,7 +75,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="updateModalLabel">Actualizar Usuario</h5>
+                <h5 class="modal-title" id="updateModalLabel">Actualizar Docente</h5>
                 <button wire:click.prevent="cancel()" type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -118,7 +118,7 @@
             @if ($usuarioFounded)
                 <div class="modal-header bg-danger text-light">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">¿Está seguro
-                        de eliminar al usuario {{ $usuarioFounded->name }}?
+                        de eliminar al docente {{ $usuarioFounded->name }}?
                     </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -144,7 +144,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importProfesoresModalLabel">Importar Profesores (Usuarios) desde Excel
+                <h5 class="modal-title" id="importProfesoresModalLabel">Importar Profesores (Docentes) desde Excel
                 </h5>
                 <button wire:click.prevent="resetImport()" type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
@@ -183,7 +183,7 @@
                             <li>La **fila 6** debe contener los encabezados: `ID ESPE`, `CÉDULA`, `APELLIDOS`,
                                 `NOMBRES`, `CORREO`.</li>
                             <li>La **CÉDULA** se usará como **contraseña inicial**.</li>
-                            <li>Se asignará el rol "Docente" por defecto a los nuevos usuarios.</li>
+                            <li>Se asignará el rol "Docente" por defecto a los nuevos docentes.</li>
                         </ul>
                     </div>
 

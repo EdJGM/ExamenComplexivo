@@ -813,30 +813,40 @@
 
                 <ul class="list-group nav nav-pills flex-column mb-auto list-unstyled ps-0">
                     @php
+                        // Verificar si es Super Admin o Administrador
+                        $isSuperAdminOrAdmin = ContextualAuth::isSuperAdminOrAdmin(Auth::user());
+
                         // Verificar permisos específicos usando las variables ya definidas
                         $puedeGestionarPeriodos = Auth::user()->can('gestionar periodos');
                         $puedeVerPeriodos = $puedeGestionarPeriodos || $esDirectorCarrera || $esDocenteApoyo;
                         $puedeGestionarCarreras = Auth::user()->can('gestionar carreras');
-                        $puedeVerEstudiantes =
+
+                        // ESTUDIANTES: Solo Director/Apoyo - NO Super Admin
+                        $puedeVerEstudiantes = !$isSuperAdminOrAdmin && (
                             Auth::user()->can('ver listado estudiantes') ||
                             Auth::user()->can('gestionar estudiantes') ||
                             $esDirectorCarrera ||
-                            $esDocenteApoyo;
-                        $puedeVerRubricas =
+                            $esDocenteApoyo
+                        );
+
+                        // RÚBRICAS: Solo Super Admin - NO Director/Apoyo
+                        $puedeVerRubricas = $isSuperAdminOrAdmin && (
                             Auth::user()->can('ver rubricas') ||
                             Auth::user()->can('gestionar rubricas') ||
-                            Auth::user()->can('gestionar plantillas rubricas') ||
-                            $esDirectorCarrera ||
-                            $esDocenteApoyo;
-                        $puedeVerTribunales =
+                            Auth::user()->can('gestionar plantillas rubricas')
+                        );
+
+                        // TRIBUNALES: Solo Director/Apoyo/Docentes - NO Super Admin
+                        $puedeVerTribunales = !$isSuperAdminOrAdmin && (
                             Auth::user()->can('ver listado tribunales') ||
                             $esDirectorCarrera ||
                             $esDocenteApoyo ||
                             $esMiembroTribunal ||
-                            $esCalificadorGeneral;
+                            $esCalificadorGeneral
+                        );
                     @endphp
 
-                    {{-- Períodos: Usuarios con permisos específicos o asignaciones contextuales --}}
+                    {{-- Períodos: Super Admin, Administrador, Director, Apoyo --}}
                     @if ($puedeVerPeriodos)
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('periodos.') }}" class="nav-link text-white">
@@ -847,7 +857,7 @@
                         </li>
                     @endif
 
-                    {{-- Carreras: Solo usuarios con permiso específico --}}
+                    {{-- Carreras: Solo Super Admin y Administrador --}}
                     @if ($puedeGestionarCarreras)
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('carreras.') }}" class="nav-link text-white">
@@ -858,7 +868,7 @@
                         </li>
                     @endif
 
-                    {{-- Estudiantes: Usuarios con permisos o asignaciones contextuales --}}
+                    {{-- Estudiantes: Solo Director/Apoyo - NO Super Admin --}}
                     @if ($puedeVerEstudiantes)
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('estudiantes.') }}" class="nav-link text-white">
@@ -869,7 +879,7 @@
                         </li>
                     @endif
 
-                    {{-- Rúbricas: Usuarios con permisos o asignaciones contextuales --}}
+                    {{-- Rúbricas: Solo Super Admin - NO Director/Apoyo --}}
                     @if ($puedeVerRubricas)
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('rubricas.') }}" class="nav-link text-white">
@@ -880,7 +890,7 @@
                         </li>
                     @endif
 
-                    {{-- Tribunales: Usuarios con permisos o asignaciones contextuales --}}
+                    {{-- Tribunales: Solo Director/Apoyo/Docentes - NO Super Admin --}}
                     @if ($puedeVerTribunales)
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('tribunales.principal') }}" class="nav-link text-white">
@@ -930,15 +940,15 @@
                     @endif
 
 
-                    {{-- Usuarios: Super Admin y Administrador --}}
+                    {{-- Docentes: Super Admin y Administrador --}}
                     @if (ContextualAuth::isSuperAdminOrAdmin(Auth::user()))
                         <hr>
-                        <h5 class="fs-6 text-secondary">Usuarios</h5>
+                        <h5 class="fs-6 text-secondary">Docentes</h5>
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('users.') }}" class="nav-link text-white">
                                 <span class="icon-wrapper">
                                     <i class="bi bi-person-lines-fill"></i></span>
-                                Usuarios
+                                Docentes
                             </a>
                         </li>
                     @endif
@@ -1023,8 +1033,9 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                         <li>
-                            <a class="dropdown-item"
-                                href="{{ route('users.profile', encrypt(Auth::id())) }}">Perfil</a>
+                            <a class="dropdown-item" href="{{ route('mi.perfil') }}">
+                                <i class="bi bi-person-circle me-2"></i>Mi Perfil
+                            </a>
                         </li>
 
                         <li>

@@ -25,9 +25,9 @@ class Periodos extends Component
     private function verificarAccesoPeriodos()
     {
         $user = auth()->user();
-        
-        // Super Admin y Administrador tienen acceso global
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+
+        // Super Admin tiene acceso global
+        if ($user->hasRole('Super Admin')) {
             return;
         }
 
@@ -44,8 +44,8 @@ class Periodos extends Component
     }    public function puedeGestionarPeriodos()
     {
         $user = auth()->user();
-        // Solo Super Admin y Administrador pueden gestionar (crear/editar/eliminar)
-        return $user->hasRole(['Super Admin', 'Administrador']) &&
+        // Solo Super Admin puede gestionar (crear/editar/eliminar)
+        return $user->hasRole('Super Admin') &&
                $user->hasPermissionTo('gestionar periodos');
     }
 
@@ -53,8 +53,8 @@ class Periodos extends Component
     {
         $user = auth()->user();
 
-        // Super Admin y Administrador pueden ver todos
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+        // Super Admin puede ver todos
+        if ($user->hasRole('Super Admin')) {
             return true;
         }
 
@@ -75,8 +75,8 @@ class Periodos extends Component
         $user = auth()->user();
         $keyWord = '%' . $this->keyWord . '%';
 
-        // Super Admin y Administrador ven todos los períodos
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+        // Super Admin ve todos los períodos
+        if ($user->hasRole('Super Admin')) {
             $periodos = Periodo::latest()
                 ->where('codigo_periodo', 'LIKE', $keyWord)
                 ->orWhere('descripcion', 'LIKE', $keyWord)
@@ -116,9 +116,9 @@ class Periodos extends Component
     public function open($periodoID)
     {
         $user = auth()->user();
-        
+
         // Verificar si puede acceder al período específico
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+        if ($user->hasRole('Super Admin')) {
             return redirect()->route('periodos.profile', $periodoID);
         }
         

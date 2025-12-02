@@ -89,8 +89,8 @@ class TribunalProfile extends Component
         // Verificar acceso contextual al tribunal
         $this->verificarAccesoTribunal();
 
-        // Profesores disponibles para la edición de miembros (excluir Super Admin y Admin)
-        $rolesExcluidosEdicion = ['Super Admin', 'Administrador'];
+        // Profesores disponibles para la edición de miembros (excluir Super Admin)
+        $rolesExcluidosEdicion = ['Super Admin'];
         $this->profesoresDisponibles = User::whereDoesntHave('roles', function ($query) use ($rolesExcluidosEdicion) {
             $query->whereIn('name', $rolesExcluidosEdicion);
         })
@@ -113,11 +113,6 @@ class TribunalProfile extends Component
 
         // Super Admin tiene acceso total
         if ($user->hasRole('Super Admin')) {
-            return;
-        }
-
-        // Administrador puede ver cualquier tribunal
-        if ($user->hasRole('Administrador')) {
             return;
         }
 
@@ -178,14 +173,6 @@ class TribunalProfile extends Component
         // Super Admin tiene acceso total
         if ($user->hasRole('Super Admin')) {
             $this->usuarioPuedeEditarDatosTribunal = true;
-            $this->usuarioPuedeVerTodasLasCalificaciones = true;
-            $this->usuarioPuedeExportarActa = $this->tribunal->estado === 'CERRADO'; // Solo si está cerrado
-            return;
-        }
-
-        // Administrador solo puede visualizar (no editar, pero puede ver calificaciones y exportar)
-        if ($user->hasRole('Administrador')) {
-            $this->usuarioPuedeEditarDatosTribunal = false;
             $this->usuarioPuedeVerTodasLasCalificaciones = true;
             $this->usuarioPuedeExportarActa = $this->tribunal->estado === 'CERRADO'; // Solo si está cerrado
             return;

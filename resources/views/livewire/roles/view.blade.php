@@ -71,7 +71,7 @@
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
 
-                                                @if(!in_array($row->name, ['Super Admin', 'Administrador']))
+                                                @if(!in_array($row->name, ['Super Admin']))
                                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                         data-bs-target="#deleteDataModal"
                                                         wire:click="eliminar({{ $row->id }})">

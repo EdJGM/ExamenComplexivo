@@ -1,4 +1,4 @@
-@section('title', __('Users'))
+@section('title', __('Docentes'))
 <div class="container-fluid">
     @include('partials.alerts')
     <div class="row justify-content-center">
@@ -8,11 +8,11 @@
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
                             <h4><i class="fab fa-laravel text-info"></i>
-                                Usuarios</h4>
+                                Docentes</h4>
                         </div>
                         <div>
                             <input wire:model='keyWord' type="text" class="form-control" name="search" id="search"
-                                placeholder="Buscar usuarios">
+                                placeholder="Buscar docentes">
                         </div>
                         <div class="btn-group">
                             @can('importar profesores')
@@ -22,7 +22,7 @@
                             @endcan
                             @can('gestionar usuarios')
                                 <div class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#createDataModal">
-                                    <i class="bi bi-plus-lg"></i> Añadir Usuario
+                                    <i class="bi bi-plus-lg"></i> Añadir Docente
                                 </div>
                             @endcan
                             @if(!auth()->user()->can('gestionar usuarios') && !auth()->user()->can('importar profesores'))

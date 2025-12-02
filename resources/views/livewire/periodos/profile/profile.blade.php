@@ -11,7 +11,7 @@
         <h3 class="me-3">Carreras</h3>
         @php
             $user = auth()->user();
-            $canManageCarrerasPeriodos = $user->hasRole(['Super Admin', 'Administrador']) && $user->hasPermissionTo('asignar carrera a periodo');
+            $canManageCarrerasPeriodos = $user->hasRole('Super Admin') && $user->hasPermissionTo('asignar carrera a periodo');
         @endphp
         @if($canManageCarrerasPeriodos)
             <button data-bs-toggle="modal" data-bs-target="#createDataModal" class="btn btn-sm btn-info me-3"

@@ -359,23 +359,36 @@ class Estudiantes extends Component
 
     /**
      * Verificar si el usuario puede realizar operaciones de gestión completa (CRUD) usando ContextualAuth
-     * Nota: Director y Docente de Apoyo NO pueden gestionar, solo visualizar e importar
+     * Director y Docente de Apoyo pueden gestionar estudiantes en sus carreras-períodos asignadas
      */
     public function puedeGestionarEstudiantes()
     {
         $user = auth()->user();
 
-        // Super Admin y Administrador con permiso específico
+        // Super Admin con permiso específico
         if (ContextualAuth::isSuperAdminOrAdmin($user)) {
             return Gate::allows('gestionar estudiantes');
         }
 
-        // Director y Docente de Apoyo NO pueden gestionar (crear/editar/eliminar)
-        // Solo pueden visualizar e importar
+        // Verificar si tiene asignaciones contextuales como Director o Docente de Apoyo
+        // en lugar de verificar rol global (porque pueden tener rol "Docente" pero estar asignados contextualmente)
+        $carrerasPeriodos = CarrerasPeriodo::where(function($query) use ($user) {
+            $query->where('director_id', $user->id)
+                  ->orWhere('docente_apoyo_id', $user->id);
+        })->exists();
+
+        if ($carrerasPeriodos) {
+            return true; // Tienen acceso automático si están asignados como director o apoyo
+        }
 
         // Otros roles requieren el permiso específico
         return Gate::allows('gestionar estudiantes');
     }
+
+   public function puedeVerTodosEstudiantes()
+    {
+        return ContextualAuth::isSuperAdminOrAdmin(auth()->user());
+    }    
 
     /**
      * Verificar si el usuario puede visualizar estudiantes usando ContextualAuth

@@ -31,6 +31,25 @@
             </div>
         </div>
 
+        <!-- Mensaje de seguridad: Cambio de contraseña -->
+        @if(!session('password_change_reminder_dismissed'))
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-info alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+                        <i class="bi bi-shield-lock fs-4 me-3"></i>
+                        <div class="flex-grow-1">
+                            <strong><i class="bi bi-info-circle me-1"></i>Recomendación de seguridad:</strong>
+                            Por tu seguridad, te recomendamos cambiar tu contraseña periódicamente.
+                            <a href="{{ route('mi.perfil') }}" class="alert-link fw-bold">Ir a mi perfil</a>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                                onclick="fetch('{{ route('dismiss.password.reminder') }}', {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}})">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Estadísticas Rápidas -->
         <div class="row">
             <div class="col-12">

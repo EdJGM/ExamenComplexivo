@@ -37,7 +37,7 @@ class Tribunales extends Component
 
     // Propiedades para control de acceso contextual
     public $puedeGestionar = false; // Director/Apoyo pueden gestionar
-    public $puedeVisualizar = false; // Administradores pueden solo ver
+    public $puedeVisualizar = false; // Solo visualización
 
     // Propiedades para el modal de creación de tribunal
     public $selected_id;
@@ -180,8 +180,8 @@ class Tribunales extends Component
                     return;
                 }
                 $user = User::find($value);
-                if ($user && $user->hasRole('Administrador')) {
-                    $fail('Un Administrador no puede ser Calificador General.');
+                if ($user && $user->hasRole('Super Admin')) {
+                    $fail('Un Super Admin no puede ser Calificador General.');
                     return;
                 }
                 $esMiembroTribunal = MiembrosTribunal::join('tribunales', 'miembros_tribunales.tribunal_id', '=', 'tribunales.id')
@@ -244,7 +244,7 @@ class Tribunales extends Component
         $this->periodo = $this->carreraPeriodo->periodo;
 
         // Lista base de todos los profesores potenciales (excluyendo Super Admin si es necesario)
-        $rolesExcluidos = ['Super Admin', 'Administrador']; // Roles a excluir de ser seleccionables
+        $rolesExcluidos = ['Super Admin']; // Roles a excluir de ser seleccionables
         $this->profesores = User::whereDoesntHave('roles', function ($query) use ($rolesExcluidos) {
             $query->whereIn('name', $rolesExcluidos);
         })
@@ -268,12 +268,6 @@ class Tribunales extends Component
         // Super Admin tiene acceso total
         if ($user->hasRole('Super Admin')) {
             $this->puedeGestionar = true;
-            $this->puedeVisualizar = true;
-        }
-
-        // Administrador solo puede visualizar
-        if ($user->hasRole('Administrador')) {
-            $this->puedeGestionar = false;
             $this->puedeVisualizar = true;
         }
 
@@ -735,8 +729,8 @@ class Tribunales extends Component
                         return;
                     }
                     $user = User::find($value);
-                    if ($user && $user->hasRole('Administrador')) {
-                        $fail('Un Administrador no puede ser Calificador General.');
+                    if ($user && $user->hasRole('Super Admin')) {
+                        $fail('Un Super Admin no puede ser Calificador General.');
                         return;
                     }
                     $esMiembroTribunal = MiembrosTribunal::join('tribunales', 'miembros_tribunales.tribunal_id', '=', 'tribunales.id')

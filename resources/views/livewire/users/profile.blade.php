@@ -81,33 +81,64 @@
                     @csrf
                     @method('PUT')
                     <ul class="list-group text-start">
-                        @foreach ($roles as $rol)
-                            <li class="list-group-item list-group-item-action list-group-item-info">
-                                <input @if ($user->hasrole($rol->name)) checked @endif name="{{ $rol->name }}"
-                                    value="{{ $rol->name }}" class="form-check-input me-1" type="checkbox"
-                                    id="rol{{ $rol->id }}">
+                        @php
+                            $superAdminRole = $roles->where('name', 'Super Admin')->first();
+                            $directorApoyo = $roles->whereIn('name', ['Director de Carrera', 'Docente de Apoyo']);
+                            $docenteRole = $roles->where('name', 'Docente')->first();
+                            $userHasDirectorOrApoyo = $user->hasRole('Director de Carrera') || $user->hasRole('Docente de Apoyo');
+                        @endphp
 
-                                <label class="form-check-label stretched-link"
-                                    for="rol{{ $rol->id }}">{{ $rol->name }}</label>
+                        {{-- 1. Super Admin (primero) --}}
+                        @if($superAdminRole)
+                            <li class="list-group-item list-group-item-action list-group-item-info">
+                                <input @if ($user->hasrole('Super Admin')) checked @endif name="Super Admin"
+                                    value="Super Admin" class="form-check-input me-1" type="checkbox"
+                                    id="rol{{ $superAdminRole->id }}">
+
+                                <label class="form-check-label stretched-link" for="rol{{ $superAdminRole->id }}">
+                                    Super Admin
+                                </label>
                             </li>
-                        @endforeach
+                        @endif
+
+                        {{-- 2. Director de Carrera / Docente de Apoyo (segundo) --}}
+                        @if($directorApoyo->count() > 0)
+                            <li class="list-group-item list-group-item-action list-group-item-info">
+                                @foreach($directorApoyo as $rol)
+                                    <input @if ($user->hasrole($rol->name)) checked @endif name="{{ $rol->name }}"
+                                        value="{{ $rol->name }}" class="form-check-input me-1" type="checkbox"
+                                        id="rol{{ $rol->id }}" style="display: none;">
+                                @endforeach
+
+                                <input @if ($userHasDirectorOrApoyo) checked @endif
+                                    name="Director de Carrera" value="Director de Carrera"
+                                    class="form-check-input me-1" type="checkbox" id="rolDirectorApoyo"
+                                    onchange="document.querySelectorAll('[name=\'Director de Carrera\'], [name=\'Docente de Apoyo\']').forEach(cb => cb.checked = this.checked)">
+
+                                <label class="form-check-label stretched-link" for="rolDirectorApoyo">
+                                    Director de Carrera / Docente de Apoyo
+                                </label>
+                            </li>
+                        @endif
+
+                        {{-- 3. Docente (tercero) --}}
+                        @if($docenteRole)
+                            <li class="list-group-item list-group-item-action list-group-item-info">
+                                <input @if ($user->hasrole('Docente')) checked @endif name="Docente"
+                                    value="Docente" class="form-check-input me-1" type="checkbox"
+                                    id="rol{{ $docenteRole->id }}">
+
+                                <label class="form-check-label stretched-link" for="rol{{ $docenteRole->id }}">
+                                    Docente
+                                </label>
+                            </li>
+                        @endif
                     </ul>
                     <button type="submit" class="btn btn-info mt-3 float-end">Guardar</button>
                 </form>
             </div>
-        @else
-            <div class="card mx-auto mt-3 p-3">
-                <h3>Roles</h3>
-                <ul class="list-group text-start">
-                    @foreach ($user->roles as $rol)
-                        <li class="list-group-item list-group-item-action list-group-item-info">
-                            <span class="badge bg-info">{{ $rol->name }}</span>
-                        </li>
-                    @endforeach
-                </ul>
-                <p class="text-muted mt-2">Solo los administradores pueden modificar roles.</p>
-            </div>
         @endcan
+        {{-- Los usuarios normales NO ven la sección de roles en su propio perfil --}}
 
 
     </div>

@@ -41,6 +41,13 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->midd
 
 Route::middleware('auth')->group(function () {
 
+    // === PERFIL DEL USUARIO (Todos los usuarios autenticados) ===
+    Route::get('/perfil', [UserController::class, 'miPerfil'])->name('mi.perfil');
+    Route::post('/dismiss-password-reminder', function() {
+        session(['password_change_reminder_dismissed' => true]);
+        return response()->json(['status' => 'success']);
+    })->name('dismiss.password.reminder');
+
     // === ROLES & PERMISOS (Solo Super Admin) ===
     Route::middleware(['permission:gestionar roles y permisos'])->prefix('roles')->namespace('Roles')->name('roles.')->group(function () {
         Route::view('/', 'livewire.roles.index');

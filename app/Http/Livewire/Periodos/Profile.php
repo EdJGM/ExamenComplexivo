@@ -24,7 +24,7 @@ class Profile extends Component
 
     public function mount($periodoId)
     {
-        $rolesExcluidosEdicion = ['Super Admin', 'Administrador'];
+        $rolesExcluidosEdicion = ['Super Admin'];
         $this->periodoId = $periodoId;
         $this->periodo = Periodo::find($this->periodoId);
 
@@ -53,7 +53,7 @@ class Profile extends Component
 
             if ($carrera && $carrera->departamento_id) {
                 // Filtrar usuarios que pertenecen al mismo departamento que la carrera
-                $rolesExcluidosEdicion = ['Super Admin', 'Administrador'];
+                $rolesExcluidosEdicion = ['Super Admin'];
                 $this->users_filtrados = User::where('departamento_id', $carrera->departamento_id)
                     ->whereDoesntHave('roles', function ($query) use ($rolesExcluidosEdicion) {
                         $query->whereIn('name', $rolesExcluidosEdicion);
@@ -78,8 +78,8 @@ class Profile extends Component
     {
         $user = auth()->user();
 
-        // Super Admin y Administrador tienen acceso global
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+        // Super Admin tiene acceso global
+        if ($user->hasRole('Super Admin')) {
             return;
         }
 
@@ -101,8 +101,8 @@ class Profile extends Component
     public function puedeGestionarCarrerasPeriodos()
     {
         $user = auth()->user();
-        // Solo Super Admin y Administrador pueden gestionar carreras-períodos
-        return $user->hasRole(['Super Admin', 'Administrador']) &&
+        // Solo Super Admin puede gestionar carreras-períodos
+        return $user->hasRole('Super Admin') &&
                $user->hasPermissionTo('asignar carrera a periodo');
     }
 
@@ -143,8 +143,8 @@ class Profile extends Component
         $query = CarrerasPeriodo::with(['carrera', 'director', 'docenteApoyo'])
             ->where('periodo_id', $this->periodoId);
 
-        // Super Admin y Administrador ven todas las carreras-períodos de este período
-        if ($user->hasRole(['Super Admin', 'Administrador'])) {
+        // Super Admin ve todas las carreras-períodos de este período
+        if ($user->hasRole('Super Admin')) {
             return $query;
         }
 

@@ -54,12 +54,15 @@
                         <div class="d-flex align-items-center">
                             <label class="me-2 mb-0">Filtrar por carrera-periodo:</label>
                             <select wire:model="carrera_periodo_filter" class="form-select form-select-sm" style="min-width: 250px;">
-                                <option value="">Todos</option>
-                                @foreach($carrerasPeriodosDisponibles as $cp)
-                                    <option value="{{ $cp->id }}">
-                                        {{ $cp->carrera->nombre ?? 'N/A' }} - {{ $cp->periodo->codigo_periodo ?? 'N/A' }}
-                                    </option>
-                                @endforeach
+                                @if($this->puedeVerTodosEstudiantes())
+                                    <option value="">Todos</option>
+                                @else
+                                    @foreach($carrerasPeriodosDisponibles as $cp)
+                                        <option value="{{ $cp->id }}">
+                                            {{ $cp->carrera->nombre ?? 'N/A' }} - {{ $cp->periodo->codigo_periodo ?? 'N/A' }}
+                                        </option>
+                                    @endforeach
+                                @endif                                
                             </select>
                         </div>
                     </div>
