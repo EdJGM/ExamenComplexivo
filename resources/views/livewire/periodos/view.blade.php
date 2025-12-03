@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <h4><i class="fab fa-laravel text-info"></i>
+                            <h4>
                                 Lista de Períodos </h4>
                         </div>
                         @if (session()->has('message'))

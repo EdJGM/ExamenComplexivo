@@ -29,27 +29,27 @@
                 }
 
                 .celda-calificacion input[type="radio"]:checked+span {
-                    color: #0d6efd !important;
+                    color: var(--bs-primary) !important;
                     font-weight: 600;
                 }
 
                 .celda-calificacion input[type="radio"]:checked {
                     transform: scale(1.2);
-                    border-color: #0d6efd;
+                    border-color: var(--bs-primary);
                 }
 
                 /* Fallback para navegadores sin soporte de :has() */
                 .celda-calificacion label.selected {
-                    background-color: #e7f1ff !important;
-                    border: 2px solid #0d6efd !important;
+                    background-color: rgba(var(--bs-primary-rgb), 0.08) !important;
+                    border: 2px solid var(--bs-primary) !important;
                     border-radius: 8px !important;
                 }
 
                 /* Para navegadores modernos que soportan :has() */
                 @supports selector(:has(*)) {
                     .celda-calificacion label:has(input[type="radio"]:checked) {
-                        background-color: #e7f1ff;
-                        border: 2px solid #0d6efd;
+                        background-color: rgba(var(--bs-primary-rgb), 0.08);
+                        border: 2px solid var(--bs-primary);
                         border-radius: 8px;
                     }
                 }

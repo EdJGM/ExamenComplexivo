@@ -21,7 +21,7 @@
                             <div class="col-md-10">
                                 <h1 class="h2 mb-2">Sistema de Gestión de Exámenes Complexivos</h1>
                                 <h2 class="h4 mb-3 opacity-75">Universidad de las Fuerzas Armadas ESPE</h2>
-                                <p class="mb-0 fs-5">
+                                <p class="mb-0 fs-5 text-white-50">
                                     Bienvenido al sistema integral para la administración y gestión de tribunales de exámenes complexivos.
                                 </p>
                             </div>

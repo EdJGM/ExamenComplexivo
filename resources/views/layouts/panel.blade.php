@@ -10,8 +10,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    @vite(['resources/js/app.js'])
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Estilos personalizados para formularios -->
@@ -48,8 +47,7 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-    {{-- importar el resources/css/app.css --}}
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {{-- Vite incluye Bootstrap + tema verde personalizado --}}
 
     <link rel="icon" href="{{ Storage::url('logos/ITIN_LOGO_SMALL.png') }}" type="image/x-icon">
 
@@ -74,7 +72,7 @@
         --dark: #232830;
         --very-light-pink: #c7c7c7;
         --text-input-field: #f7f7f7;
-        --hospital-green: #0d6efd;
+        --hospital-green: var(--bs-primary);
         --sm: 14px;
         --md: 16px;
         --lg: 18px;
@@ -154,7 +152,7 @@
     }
 
     .link_styled {
-        color: #0d6efd;
+        color: var(--bs-primary);
         cursor: pointer;
     }
 
@@ -164,7 +162,7 @@
         border-radius: 5px;
         padding: 5px 0;
         color: #fff;
-        background-color: #0d6efd;
+        background-color: var(--bs-primary);
         transition: all 0.3s;
     }
 
@@ -321,7 +319,7 @@
     }
 
     .nav-item.list-group.nav-link-item:hover {
-        background-color: #0d6efd;
+        background-color: var(--bs-primary);
         transform: translateX(5px);
         transition: all 0.1s linear;
     }
@@ -570,10 +568,7 @@
         border-radius: 0;
     }
 
-    ::-webkit-scrollbar-thumb {
-        border-radius: 0;
-        background-color: #0d6efd;
-    }
+    ::-webkit-scrollbar-thumb { border-radius: 0; background-color: var(--bs-primary); }
 
 
     .login-button:hover {
@@ -624,10 +619,7 @@
         background-color: #f8f9fa;
     }
 
-    .choices__item--highlighted {
-        background-color: #0d6efd !important;
-        color: white !important;
-    }
+    .choices__item--highlighted { background-color: var(--bs-primary) !important; color: white !important; }
 
     .choices__placeholder {
         color: #6c757d;
@@ -703,13 +695,30 @@
         margin: 15px auto 15px;
         border-radius: 5px;
     }
+
+    /* Asegurar que el dropdown del usuario sea visible sobre el sidebar y no se recorte */
+    .dropdown-menu {
+        z-index: 1060; /* por encima del sidebar y sombras */
+    }
+    /* Evitar posicionamiento absoluto que pueda quedar oculto por overflow del contenedor */
+    .dropdown.position-static .dropdown-menu {
+        position: static;
+    }
+    /* En el sidebar, forzar menú estático para evitar problemas de stacking/overflow */
+    #sidebar .dropdown-menu {
+        position: static;
+    }
+    /* Dar espacio al final del sidebar para que el menú no se recorte */
+    #sidebar {
+        padding-bottom: 1rem;
+    }
 </style>
 
 <body>
 
     <div class="wrapper">
         <div id="sidebar_container" class="sidebar_container">
-            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;" id="sidebar">
+            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" id="sidebar" style="width: 280px; background-image: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)), url('{{ Storage::url('fondos/ESPE.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                 <a href="{{ url('/') }}"
                     class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none text-center">
                     <span class="fs-4">Sistema Examen Complexivo</span>
@@ -809,7 +818,7 @@
                     </small>
                 </div>
                 <hr>
-                <h5 class="fs-6 text-secondary">Control</h5>
+                <h5 class="fs-4 fw-bold text-primary">Control</h5>
 
                 <ul class="list-group nav nav-pills flex-column mb-auto list-unstyled ps-0">
                     @php
@@ -912,7 +921,7 @@
                     {{-- Roles y Permisos: Solo Super Admin --}}
                     @if (Auth::user()->roles->where('name', 'Super Admin')->isNotEmpty())
                         <hr>
-                        <h5 class="fs-6 text-secondary">Acceso</h5>
+                        <h5 class="fs-4 fw-bold text-primary">Acceso</h5>
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('roles.') }}" class="nav-link text-white">
                                 <span class="icon-wrapper">
@@ -933,7 +942,7 @@
                     {{-- Usuarios: Super Admin y Administrador --}}
                     @if (ContextualAuth::isSuperAdminOrAdmin(Auth::user()))
                         <hr>
-                        <h5 class="fs-6 text-secondary">Usuarios</h5>
+                        <h5 class="fs-4 fw-bold text-primary">Usuarios</h5>
                         <li class="nav-item list-group nav-link-item">
                             <a href="{{ route('users.') }}" class="nav-link text-white">
                                 <span class="icon-wrapper">
@@ -1014,10 +1023,10 @@
                 <hr>
 
 
-                <div class="dropdown">
+                <div class="dropdown position-static">
                     <a href="#"
                         class="d-flex align-items-center text-white text-decoration-none dropdown-toggle text-break"
-                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false"
+                        id="dropdownUser1" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false"
                         style="white-space: normal;">
                         <strong class="text-break" style="word-break: break-word;">{{ Auth::user()->name }}</strong>
                     </a>

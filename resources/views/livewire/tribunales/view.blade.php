@@ -10,7 +10,7 @@
         }
 
         .sortable-header:hover {
-            background-color: rgba(0, 123, 255, 0.1) !important;
+            background-color: rgba(var(--bs-primary-rgb), 0.08) !important;
             transform: translateY(-1px);
         }
 
@@ -36,7 +36,7 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background-color: #0d6efd;
+            background-color: var(--bs-primary);
             transition: width 0.3s ease, left 0.3s ease;
         }
 

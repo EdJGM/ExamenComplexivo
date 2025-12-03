@@ -17,8 +17,7 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    @vite(['resources/js/app.js'])
     <!-- Choices.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css">
     <!-- Bootstrap Icons -->
@@ -27,136 +26,19 @@
     <!-- Scripts -->
     @livewireStyles
     <style>
-        /* Estilos globales para el sistema */
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: #f8f9fa;
-        }
-
-        .contentImagePrincipalContainer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* max-height: calc(100vh - 70px); */
-            z-index: 0;
-        }
-
-        .contentImagePrincipalContainer img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.85) contrast(1.1);
-        }
-
-        /* Estilos mejorados para la navegación */
-        .navbar {
-            background: linear-gradient(135deg, rgba(68, 68, 68, 0.356) 0%, rgba(255, 255, 255, 0.534) 100%) !important;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            height: 70px;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-        }
-
-        .nav-link {
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border-radius: 0.5rem;
-            margin: 0 0.25rem;
-            padding: 0.5rem 1rem !important;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border-radius: 0.75rem;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .dropdown-item {
-            border-radius: 0.5rem;
-            margin: 0.25rem;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
-        }
-
-        /* Mejoras generales para formularios */
-        .form-control, .form-select {
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-            border-color: #86b7fe;
-        }
-
-        .btn {
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Cards mejorados */
-        .card {
-            border-radius: 1rem;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Animaciones sutiles */
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .contentImagePrincipalContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .contentImagePrincipalContainer img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92) contrast(1.05); }
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
     </style>
 </head>
 
 <body>
     <div id="app" style="background:#ffffff;">
-        <nav class="navbar sticky-top navbar-expand-md navbar-light shadow-sm mb-4">
+        <nav class="navbar sticky-top navbar-expand-md navbar-dark shadow-sm mb-4" style="height:70px; background-image: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('{{ Storage::url('fondos/ESPE.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <div class="container" style="height:70px;">
                 <!-- Logo y Brand -->
-                <div class="navbar-brand d-flex align-items-center">
+            <div class="navbar-brand d-flex align-items-center text-white">
                     {{-- <img src="{{ Storage::url('logos/LOGO-ESPE_500.png') }}" alt="ESPE Logo"
                         style="width:150px;object-fit:contain;margin-right:12px;"> --}}
                     <div class="d-none d-md-block">
@@ -178,7 +60,7 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link text-light d-flex align-items-center" href="{{ route('login') }}">
+                                    <a class="nav-link text-white d-flex align-items-center" href="{{ route('login') }}">
                                         <i class="bi bi-box-arrow-in-right me-2"></i>
                                         {{ __('Iniciar Sesión') }}
                                     </a>
@@ -187,7 +69,7 @@
 
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link text-light d-flex align-items-center" href="{{ route('register') }}">
+                                    <a class="nav-link text-white d-flex align-items-center" href="{{ route('register') }}">
                                         <i class="bi bi-person-plus me-2"></i>
                                         {{ __('Registrarse') }}
                                     </a>
@@ -195,7 +77,7 @@
                             @endif
                         @else
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle text-light d-flex align-items-center"
+                                          <a id="navbarDropdown" class="nav-link dropdown-toggle text-white d-flex align-items-center"
                                    href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     <i class="bi bi-person-circle me-2 fs-5"></i>
                                     <span class="fw-semibold">{{ Auth::user()->name }}</span>
@@ -227,12 +109,12 @@
         </div>
         <main class="p-0 m-0 fade-in">
             {{-- Contenido Principal --}}
-            @yield('content')
+            <div class="container py-4">
+                @yield('content')
+            </div>
         </main>
     </div>
     @livewireScripts
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Choices.js JS -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
     <script type="module">

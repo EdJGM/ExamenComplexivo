@@ -95,7 +95,7 @@
     <style>
         /* Estilos específicos para el login */
         .login-button {
-            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, #15803d 100%);
             border: none;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -103,9 +103,9 @@
         }
 
         .login-button:hover {
-            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            background: linear-gradient(135deg, #15803d 0%, #0f5132 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
+            box-shadow: 0 8px 25px rgba(var(--bs-primary-rgb), 0.3);
         }
 
         .login-button:active {
@@ -118,8 +118,8 @@
         }
 
         .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
         }
 
         .card {
@@ -129,7 +129,7 @@
 
         .form-floating>.form-control:focus~label,
         .form-floating>.form-control:not(:placeholder-shown)~label {
-            color: #0d6efd;
+            color: var(--bs-primary);
         }
 
         /* Animación sutil para el card */
@@ -151,8 +151,8 @@
 
         /* Mejorar el input de checkbox */
         .form-check-input:checked {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
         }
     </style>
 @endsection

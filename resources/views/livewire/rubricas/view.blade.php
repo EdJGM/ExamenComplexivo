@@ -11,7 +11,7 @@
                 <div class="card-header">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <h3><i class="fab fa-laravel text-info"></i>
+                            <h3>
                                 Listado de Rubricas</h3>
                         </div>
                         <div>

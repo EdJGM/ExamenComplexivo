@@ -1,12 +1,6 @@
 @extends('layouts.app')
-
-@section('content')
-    <div class="container-fluid p-0 m-0">
-        <div class="row justify-content-center align-items-center vh-100 p-0 m-0 w-100">
-            <div class="col-md-5 w-100">
-                <div class="card shadow-lg border-0 m-0 mx-auto text-dark"
-                    style="max-width:500px;width:90%;backdrop-filter: blur(10px);background:rgba(255, 255, 255, 0.63);">
-                    <!-- Header con logo y título -->
+        a { color: var(--bs-primary); transition: color 0.2s ease; }
+        a:hover { color: #0f5132; }
                     <div class="card-header bg-transparent border-0 text-center py-4">
                         <div class="mb-3">
                             <img src="{{ Storage::url('logos/LOGO-ESPE_500.png') }}" alt="ESPE Logo"

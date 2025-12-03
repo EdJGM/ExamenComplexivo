@@ -5,3 +5,26 @@ $body-bg: #f8fafc;
 $font-family-sans-serif: 'Nunito', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
+
+// Theme Colors (Green theme)
+// Primary brand color (emerald/green)
+$primary: #16a34a; // emerald-600
+$primary-rgb: 22, 163, 74;
+$success: #22c55e; // emerald-500
+$success-rgb: 34, 197, 94;
+$secondary: #065f46; // emerald-900
+$secondary-rgb: 6, 95, 70;
+$info: #0ea5e9; // keep cyan info
+$warning: #f59e0b; // amber
+$danger: #dc3545; // bootstrap red
+
+// Links
+$link-color: $primary;
+
+// Components
+$btn-border-radius: .5rem;
+$btn-border-radius-sm: .5rem;
+$btn-border-radius-lg: .75rem;
+$card-border-radius: 1rem;
+$input-border-radius: .5rem;
+$enable-shadows: true;
