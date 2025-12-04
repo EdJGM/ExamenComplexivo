@@ -5,13 +5,13 @@
         <!-- Header de Bienvenida -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card bg-primary text-white">
+                <div class="card text-white" style="background: linear-gradient(135deg, #2d7a4f 0%, #1a4d30 100%);">
                     <div class="card-body p-4">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center">
                                 @if (file_exists(public_path('storage/logos/LOGO-ESPE_500.png')))
                                     <img src="{{ asset('storage/logos/LOGO-ESPE_500.png') }}" alt="Logo ESPE"
-                                         class="img-fluid" style="width: 250px; filter: brightness(0) invert(1);">
+                                         class="img-fluid" style="max-width: 150px; height: auto;">
                                 @else
                                     <div class="bg-white bg-opacity-25 rounded p-4">
                                         <i class="bi bi-building fs-1"></i>
@@ -19,9 +19,9 @@
                                 @endif
                             </div>
                             <div class="col-md-10">
-                                <h1 class="h2 mb-2">Sistema de Gestión de Exámenes Complexivos</h1>
-                                <h2 class="h4 mb-3 opacity-75">Universidad de las Fuerzas Armadas ESPE</h2>
-                                <p class="mb-0 fs-5">
+                                <h1 class="h2 mb-2 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Sistema de Gestión de Exámenes Complexivos</h1>
+                                <h2 class="h4 mb-3" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.3); opacity: 0.95;">Universidad de las Fuerzas Armadas ESPE</h2>
+                                <p class="mb-0 fs-5" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                                     Bienvenido al sistema integral para la administración y gestión de tribunales de exámenes complexivos.
                                 </p>
                             </div>

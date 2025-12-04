@@ -71,71 +71,73 @@
     :root {
         --white: #ffffff;
         --black: #000000;
-        --dark: #232830;
+        --dark: #1a3d2e;
         --very-light-pink: #c7c7c7;
         --text-input-field: #f7f7f7;
-        --hospital-green: #0d6efd;
+        --hospital-green: #2d7a4f;
+        --espe-green: #2d7a4f;
+        --espe-green-dark: #1a4d30;
+        --espe-green-light: #4a9d6f;
         --sm: 14px;
         --md: 16px;
         --lg: 18px;
 
-        /* Variables de Bootstrap personalizadas */
-        /* Color info original: #0dcaf0 - Nuevo color más oscuro */
-        --bs-info: #0ea5e9;
-        --bs-info-rgb: 14, 165, 233;
+        /* Variables de Bootstrap personalizadas - Tema verde ESPE */
+        --bs-info: #2d7a4f;
+        --bs-info-rgb: 45, 122, 79;
 
         /* Variables completas para todos los elementos info */
-        --bs-info-bg-subtle: rgba(14, 165, 233, 0.125);
-        --bs-info-border-subtle: rgba(14, 165, 233, 0.375);
-        --bs-info-text-emphasis: #0369a1;
+        --bs-info-bg-subtle: rgba(45, 122, 79, 0.125);
+        --bs-info-border-subtle: rgba(45, 122, 79, 0.375);
+        --bs-info-text-emphasis: #1a4d30;
 
         /* Variables para botones y badges */
         --bs-btn-color: #fff;
-        --bs-btn-bg: #0ea5e9;
-        --bs-btn-border-color: #0ea5e9;
+        --bs-btn-bg: #2d7a4f;
+        --bs-btn-border-color: #2d7a4f;
         --bs-btn-hover-color: #fff;
-        --bs-btn-hover-bg: #0284c7;
-        --bs-btn-hover-border-color: #0284c7;
-        --bs-btn-focus-shadow-rgb: 14, 165, 233;
+        --bs-btn-hover-bg: #1a4d30;
+        --bs-btn-hover-border-color: #1a4d30;
+        --bs-btn-focus-shadow-rgb: 45, 122, 79;
         --bs-btn-active-color: #fff;
-        --bs-btn-active-bg: #0369a1;
-        --bs-btn-active-border-color: #0369a1;
+        --bs-btn-active-bg: #1a4d30;
+        --bs-btn-active-border-color: #1a4d30;
         --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
         --bs-btn-disabled-color: #fff;
-        --bs-btn-disabled-bg: #0ea5e9;
-        --bs-btn-disabled-border-color: #0ea5e9;
+        --bs-btn-disabled-bg: #2d7a4f;
+        --bs-btn-disabled-border-color: #2d7a4f;
     }
 
-    /* Sobrescribir clases específicas de Bootstrap para color info */
+    /* Sobrescribir clases específicas de Bootstrap para color verde ESPE */
     .bg-info {
-        background-color: #0ea5e9 !important;
+        background-color: #2d7a4f !important;
     }
 
     .badge.bg-info {
-        background-color: #0ea5e9 !important;
+        background-color: #2d7a4f !important;
         color: #fff !important;
     }
 
     .btn-info {
-        background-color: #0ea5e9 !important;
-        border-color: #0ea5e9 !important;
+        background-color: #2d7a4f !important;
+        border-color: #2d7a4f !important;
         color: #fff !important;
     }
 
     .btn-info:hover {
-        background-color: #0284c7 !important;
-        border-color: #0284c7 !important;
+        background-color: #1a4d30 !important;
+        border-color: #1a4d30 !important;
         color: #fff !important;
     }
 
     .text-info {
-        color: #0ea5e9 !important;
+        color: #2d7a4f !important;
     }
 
     .alert-info {
-        background-color: rgba(14, 165, 233, 0.125) !important;
-        border-color: rgba(14, 165, 233, 0.375) !important;
-        color: #0369a1 !important;
+        background-color: rgba(45, 122, 79, 0.125) !important;
+        border-color: rgba(45, 122, 79, 0.375) !important;
+        color: #1a4d30 !important;
     }
 
     * {
@@ -154,7 +156,7 @@
     }
 
     .link_styled {
-        color: #0d6efd;
+        color: #2d7a4f;
         cursor: pointer;
     }
 
@@ -164,7 +166,7 @@
         border-radius: 5px;
         padding: 5px 0;
         color: #fff;
-        background-color: #0d6efd;
+        background-color: #2d7a4f;
         transition: all 0.3s;
     }
 
@@ -321,7 +323,7 @@
     }
 
     .nav-item.list-group.nav-link-item:hover {
-        background-color: #0d6efd;
+        background-color: #2d7a4f;
         transform: translateX(5px);
         transition: all 0.1s linear;
     }
@@ -377,6 +379,28 @@
         scroll-behavior: smooth;
         height: 100vh;
         position: fixed;
+        background-image: url('{{ Storage::url("fondos/ESPE.png") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    #sidebar::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background-color: rgba(26, 61, 46, 0.92);
+        z-index: 0;
+        pointer-events: none;
+    }
+    
+    #sidebar > * {
+        position: relative;
+        z-index: 1;
     }
 
     .wrapper {
@@ -399,19 +423,19 @@
     .button_sideBar {
         display: none;
         border: none;
-        background: #0d6dfd30;
+        background: rgba(45, 122, 79, 0.2);
         border-radius: 5px;
         padding: 0 5px;
     }
 
     .button_sideBar:active {
-        border: solid 1px #0d6dfd;
+        border: solid 1px #2d7a4f;
     }
 
     .button_close_sideBar {
         display: none;
         border: none;
-        background: #0d6dfd30;
+        background: rgba(45, 122, 79, 0.2);
         border-radius: 5px;
         padding: 0 5px;
     }
@@ -548,8 +572,8 @@
 
     .big-welcome {
         font-size: 6rem;
-        color: #0d6dfd;
-        /* Color naranja para el saludo en español */
+        color: #2d7a4f;
+        /* Color verde ESPE para el saludo */
     }
 
     .medium-welcome {
@@ -572,14 +596,14 @@
 
     ::-webkit-scrollbar-thumb {
         border-radius: 0;
-        background-color: #0d6efd;
+        background-color: #2d7a4f;
     }
 
 
     .login-button:hover {
-        background-color: #007bff;
+        background-color: #2d7a4f;
         background-image: radial-gradient(at 30% 30%, rgba(255, 255, 255, 0.15), transparent 50%), radial-gradient(at 90% 20%, rgba(0, 0, 0, 0.1), transparent 50%);
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.25), 0 0.2rem 1rem rgba(0, 123, 255, 0.15);
+        box-shadow: 0 0.25rem 0.5rem rgba(45, 122, 79, 0.25), 0 0.2rem 1rem rgba(45, 122, 79, 0.15);
     }
 
     .choices {
@@ -625,7 +649,7 @@
     }
 
     .choices__item--highlighted {
-        background-color: #0d6efd !important;
+        background-color: #2d7a4f !important;
         color: white !important;
     }
 
