@@ -21,6 +21,7 @@ class Profile extends Component
     public $carrera_id, $director_id, $docente_apoyo_id;
     public $selected_id;
     public $founded;
+    public $mostrar_todos_docentes = false; // Controla si se muestran todos los docentes o solo del departamento
 
     public function mount($periodoId)
     {
@@ -43,15 +44,17 @@ class Profile extends Component
     }
 
     /**
-     * Ejecutar cuando cambia la carrera seleccionada
      * Filtrar usuarios por departamento de la carrera
      */
-    public function updatedCarreraId($value)
+    private function filtrarUsuariosPorCarrera($carreraId)
     {
-        if ($value) {
-            $carrera = Carrera::find($value);
+        if ($carreraId) {
+            $carrera = Carrera::find($carreraId);
 
-            if ($carrera && $carrera->departamento_id) {
+            // Si se activó "mostrar todos los docentes", mostrar todos sin filtrar
+            if ($this->mostrar_todos_docentes) {
+                $this->users_filtrados = $this->users;
+            } elseif ($carrera && $carrera->departamento_id) {
                 // Filtrar usuarios que pertenecen al mismo departamento que la carrera
                 $rolesExcluidosEdicion = ['Super Admin'];
                 $this->users_filtrados = User::where('departamento_id', $carrera->departamento_id)
@@ -68,10 +71,31 @@ class Profile extends Component
             // Si no hay carrera seleccionada, vaciar usuarios filtrados
             $this->users_filtrados = collect();
         }
+    }
+
+    /**
+     * Ejecutar cuando cambia la carrera seleccionada
+     * Filtrar usuarios por departamento de la carrera
+     */
+    public function updatedCarreraId($value)
+    {
+        $this->filtrarUsuariosPorCarrera($value);
 
         // Resetear director y apoyo al cambiar carrera
         $this->director_id = null;
         $this->docente_apoyo_id = null;
+    }
+
+    /**
+     * Ejecutar cuando cambia el checkbox de "Mostrar todos los docentes"
+     * Actualizar la lista de usuarios filtrados
+     */
+    public function updatedMostrarTodosDocentes()
+    {
+        // Refiltrar usuarios con la nueva configuración
+        if ($this->carrera_id) {
+            $this->filtrarUsuariosPorCarrera($this->carrera_id);
+        }
     }
 
     private function verificarAccesoAlPeriodo()
@@ -199,6 +223,11 @@ class Profile extends Component
         $record = CarrerasPeriodo::findOrFail($id);
         $this->selected_id = $id;
         $this->carrera_id = $record->carrera_id;
+
+        // Cargar los usuarios filtrados del departamento de la carrera
+        $this->filtrarUsuariosPorCarrera($this->carrera_id);
+
+        // Después de filtrar los usuarios, establecer director y docente de apoyo
         $this->director_id = $record->director_id;
         $this->docente_apoyo_id = $record->docente_apoyo_id;
         $this->dispatchBrowserEvent('openModalByName', ['modalName' => 'updateDataModal']);
@@ -280,6 +309,7 @@ class Profile extends Component
         $this->docente_apoyo_id = null;
         $this->selected_id = null;
         $this->founded = null;
+        $this->mostrar_todos_docentes = false; // Resetear el filtro al cerrar el modal
     }
 
     private function refreshCarrerasPeriodos()
