@@ -475,8 +475,16 @@
     }
 
     .sidebar-menu-link.active {
-        background: linear-gradient(135deg, #2d7a5f 0%, #1a4d30 100%);
-        color: #ffffff;
+        background: linear-gradient(135deg, rgba(61, 142, 114, 0.15) 0%, rgba(61, 166, 106, 0.15) 100%);
+        color: #2d7a5f;
+        font-weight: 600;
+        border-left: 4px solid #3d8e72ff;
+        padding-left: 11px;
+        box-shadow: 0 2px 4px rgba(61, 142, 114, 0.1);
+    }
+
+    .sidebar-menu-link.active i {
+        color: #3d8e72ff;
     }
 
     .sidebar-menu-link i {
@@ -1021,11 +1029,30 @@
 
                     {{-- Mostrar asignaciones en tribunales con contexto completo --}}
                     @if ($esMiembroTribunal)
-                        @foreach ($tribunalesAsignados as $tribunal)
+                        @php
+                            // Agrupar tribunales por rol y carrera para evitar repeticiones
+                            $tribunalesAgrupados = collect($tribunalesAsignados)->groupBy(function($tribunal) {
+                                return $tribunal->status . '|' . $tribunal->tribunal->carrerasPeriodo->carrera->nombre;
+                            });
+                        @endphp
+                        @foreach ($tribunalesAgrupados as $key => $grupoTribunales)
+                            @php
+                                $primerTribunal = $grupoTribunales->first();
+                                $cantidad = $grupoTribunales->count();
+                                $rol = ucwords(strtolower($primerTribunal->status));
+                                $carreraNombre = $primerTribunal->tribunal->carrerasPeriodo->carrera->nombre;
+                            @endphp
                             <div class="mb-2">
                                 <span class="badge bg-primary text-white w-100 py-2 text-start" style="white-space: normal; margin-bottom: 2px">
-                                    <span>{{ ucwords(strtolower($tribunal->status)) }}</span><br>
-                                    <span >{{ $tribunal->tribunal->carrerasPeriodo->carrera->nombre }}</span>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <span>{{ $rol }}</span>
+                                        @if($cantidad > 1)
+                                            <span class="badge bg-white text-primary ms-2" style="font-size: 10px; padding: 2px 6px;">
+                                                {{ $cantidad }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <span style="font-size: 11px;">{{ $carreraNombre }}</span>
                                 </span>
                             </div>
                         @endforeach
@@ -1052,7 +1079,7 @@
                     <div class="menu-category">MAIN</div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-menu-item">
-                            <a href="{{ route('home') }}" class="sidebar-menu-link">
+                            <a href="{{ route('home') }}" class="sidebar-menu-link {{ Request::routeIs('home') ? 'active' : '' }}">
                                 <i class="bi bi-house-door"></i>
                                 <span>Principal</span>
                             </a>
@@ -1099,7 +1126,7 @@
                         {{-- Períodos: Super Admin, Administrador, Director, Apoyo --}}
                         @if ($puedeVerPeriodos)
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('periodos.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('periodos.') }}" class="sidebar-menu-link {{ Request::is('periodos*') ? 'active' : '' }}">
                                     <i class="bi bi-calendar3"></i>
                                     <span>Períodos</span>
                                 </a>
@@ -1109,7 +1136,7 @@
                         {{-- Carreras: Solo Super Admin y Administrador --}}
                         @if ($puedeGestionarCarreras)
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('carreras.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('carreras.') }}" class="sidebar-menu-link {{ Request::is('carreras*') ? 'active' : '' }}">
                                     <i class="bi bi-mortarboard"></i>
                                     <span>Carreras</span>
                                 </a>
@@ -1119,7 +1146,7 @@
                         {{-- Estudiantes: Solo Director/Apoyo - NO Super Admin --}}
                         @if ($puedeVerEstudiantes)
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('estudiantes.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('estudiantes.') }}" class="sidebar-menu-link {{ Request::is('estudiantes*') ? 'active' : '' }}">
                                     <i class="bi bi-people"></i>
                                     <span>Estudiantes</span>
                                 </a>
@@ -1129,7 +1156,7 @@
                         {{-- Rúbricas: Solo Super Admin - NO Director/Apoyo --}}
                         @if ($puedeVerRubricas)
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('rubricas.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('rubricas.') }}" class="sidebar-menu-link {{ Request::is('rubricas*') ? 'active' : '' }}">
                                     <i class="bi bi-grid-3x3-gap"></i>
                                     <span>Rúbricas</span>
                                 </a>
@@ -1139,7 +1166,7 @@
                         {{-- Tribunales: Solo Director/Apoyo/Docentes - NO Super Admin --}}
                         @if ($puedeVerTribunales)
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('tribunales.principal') }}" class="sidebar-menu-link">
+                                <a href="{{ route('tribunales.principal') }}" class="sidebar-menu-link {{ Request::is('tribunales*') ? 'active' : '' }}">
                                     <i class="bi bi-person-lines-fill"></i>
                                     <span>Tribunales</span>
                                 </a>
@@ -1167,13 +1194,13 @@
                         <div class="menu-category">ADMINISTRACIÓN</div>
                         <ul class="sidebar-menu">
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('roles.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('roles.') }}" class="sidebar-menu-link {{ Request::is('roles*') ? 'active' : '' }}">
                                     <i class="bi bi-shield-check"></i>
                                     <span>Roles</span>
                                 </a>
                             </li>
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('permissions.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('permissions.') }}" class="sidebar-menu-link {{ Request::is('permissions*') ? 'active' : '' }}">
                                     <i class="bi bi-key"></i>
                                     <span>Permisos</span>
                                 </a>
@@ -1186,7 +1213,7 @@
                         <div class="menu-category">GESTIÓN DE USUARIOS</div>
                         <ul class="sidebar-menu">
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('users.') }}" class="sidebar-menu-link">
+                                <a href="{{ route('users.') }}" class="sidebar-menu-link {{ Request::is('users*') || Request::is('docentes*') ? 'active' : '' }}">
                                     <i class="bi bi-people-fill"></i>
                                     <span>Docentes</span>
                                 </a>
