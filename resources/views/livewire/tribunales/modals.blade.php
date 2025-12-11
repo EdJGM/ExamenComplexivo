@@ -174,10 +174,19 @@
                     <button wire:click="resetDeleteConfirmation" type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Está seguro de que desea eliminar el tribunal para el estudiante
-                        <strong>{{ $tribunalAEliminar->estudiante->nombres }} {{ $tribunalAEliminar->estudiante->apellidos }}</strong>
-                        programado para el <strong>{{ \Carbon\Carbon::parse($tribunalAEliminar->fecha)->format('d/m/Y') }}</strong>?
-                    </p>
+                    @if($tribunalAEliminar->es_plantilla)
+                        {{-- Mensaje para plantilla --}}
+                        <p>¿Está seguro de que desea eliminar la <strong>plantilla "{{ $tribunalAEliminar->descripcion_plantilla }}"</strong>
+                            programada para el <strong>{{ \Carbon\Carbon::parse($tribunalAEliminar->fecha)->format('d/m/Y') }}</strong>?
+                        </p>
+                        <p class="text-warning"><i class="bi bi-exclamation-triangle"></i> Esta plantilla aún no tiene estudiantes asignados.</p>
+                    @else
+                        {{-- Mensaje para tribunal individual --}}
+                        <p>¿Está seguro de que desea eliminar el tribunal para el estudiante
+                            <strong>{{ $tribunalAEliminar->estudiante->nombres }} {{ $tribunalAEliminar->estudiante->apellidos }}</strong>
+                            programado para el <strong>{{ \Carbon\Carbon::parse($tribunalAEliminar->fecha)->format('d/m/Y') }}</strong>?
+                        </p>
+                    @endif
                     <p class="text-danger fw-bold">Esta acción no se puede deshacer y se eliminarán los miembros asociados.</p>
                 </div>
                 <div class="modal-footer">
