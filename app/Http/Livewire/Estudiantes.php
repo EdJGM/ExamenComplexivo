@@ -180,11 +180,24 @@ class Estudiantes extends Component
         $this->validate([
             'nombres' => 'required',
             'apellidos' => 'required',
-            'cedula' => 'required|unique:estudiantes,cedula',
-            'correo' => 'required|email|unique:estudiantes,correo',
+            'cedula' => [
+                'required',
+                'unique:estudiantes,cedula,NULL,id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
+            'correo' => [
+                'required',
+                'email',
+                'unique:estudiantes,correo,NULL,id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
             'telefono' => 'nullable',
-            'username' => 'required|unique:estudiantes,username',
-            'ID_estudiante' => 'required|unique:estudiantes,ID_estudiante',
+            'username' => [
+                'required',
+                'unique:estudiantes,username,NULL,id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
+            'ID_estudiante' => [
+                'required',
+                'unique:estudiantes,ID_estudiante,NULL,id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
             'carrera_periodo_id' => 'required|exists:carreras_periodos,id',
         ]);
 
@@ -235,11 +248,24 @@ class Estudiantes extends Component
         $this->validate([
             'nombres' => 'required',
             'apellidos' => 'required',
-            'cedula' => 'required|unique:estudiantes,cedula,' . $this->selected_id,
-            'correo' => 'required|email|unique:estudiantes,correo,' . $this->selected_id,
+            'cedula' => [
+                'required',
+                'unique:estudiantes,cedula,' . $this->selected_id . ',id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
+            'correo' => [
+                'required',
+                'email',
+                'unique:estudiantes,correo,' . $this->selected_id . ',id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
             'telefono' => 'nullable',
-            'username' => 'required|unique:estudiantes,username,' . $this->selected_id,
-            'ID_estudiante' => 'required|unique:estudiantes,ID_estudiante,' . $this->selected_id,
+            'username' => [
+                'required',
+                'unique:estudiantes,username,' . $this->selected_id . ',id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
+            'ID_estudiante' => [
+                'required',
+                'unique:estudiantes,ID_estudiante,' . $this->selected_id . ',id,carrera_periodo_id,' . $this->carrera_periodo_id
+            ],
             'carrera_periodo_id' => 'required|exists:carreras_periodos,id',
         ]);
 

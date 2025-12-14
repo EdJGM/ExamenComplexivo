@@ -23,22 +23,31 @@
                     </div>
                 </div>
                 <div class="btn-group">
-                    @can('importar profesores')
+                    @php
+                        $user = auth()->user();
+                        // Verificar si puede importar: Super Admin con permiso O Director/Apoyo contextual
+                        $puedeImportar = (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && $user->can('importar profesores'))
+                                        || \App\Helpers\ContextualAuth::hasActiveAssignments($user);
+                        // Verificar si puede gestionar: Super Admin con permiso O Director/Apoyo contextual
+                        $puedeGestionar = (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && $user->can('gestionar usuarios'))
+                                         || \App\Helpers\ContextualAuth::hasActiveAssignments($user);
+                    @endphp
+                    @if($puedeImportar)
                         <button class="btn btn-lg text-white" data-bs-toggle="modal" data-bs-target="#importProfesoresModal"
                                 style="border: 2px solid white; background: transparent; transition: all 0.3s ease;"
                                 onmouseover="this.style.background='rgba(255,255,255,0.2)'"
                                 onmouseout="this.style.background='transparent'">
                             <i class="bi bi-file-earmark-excel me-2"></i>Importar Profesores
                         </button>
-                    @endcan
-                    @can('gestionar usuarios')
+                    @endif
+                    @if($puedeGestionar)
                         <button class="btn btn-lg text-white" data-bs-toggle="modal" data-bs-target="#createDataModal"
                                 style="border: 2px solid white; background: transparent; transition: all 0.3s ease;"
                                 onmouseover="this.style.background='rgba(255,255,255,0.2)'"
                                 onmouseout="this.style.background='transparent'">
                             <i class="bi bi-plus-circle me-2"></i>Añadir Docente
                         </button>
-                    @endcan
+                    @endif
                 </div>
             </div>
         </div>
@@ -229,7 +238,12 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm" role="group">
-                                                @can('gestionar usuarios')
+                                                @php
+                                                    // Solo Super Admin puede editar/eliminar
+                                                    $esSuperAdmin = \App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user)
+                                                                    && $user->can('gestionar usuarios');
+                                                @endphp
+                                                @if($esSuperAdmin)
                                                     <button class="btn btn-outline-primary"
                                                             wire:click="edit({{ $row->id }})"
                                                             title="Editar">
@@ -243,8 +257,10 @@
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 @else
-                                                    <span class="badge bg-secondary">Solo lectura</span>
-                                                @endcan
+                                                    <span class="badge bg-info">
+                                                        <i class="bi bi-eye"></i> Solo lectura
+                                                    </span>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

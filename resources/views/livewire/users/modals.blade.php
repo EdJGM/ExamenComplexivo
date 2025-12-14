@@ -1,5 +1,10 @@
 <!-- Add Modal -->
-@can('gestionar usuarios')
+@php
+    $user = auth()->user();
+    $puedeGestionar = (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && $user->can('gestionar usuarios'))
+                     || \App\Helpers\ContextualAuth::hasActiveAssignments($user);
+@endphp
+@if($puedeGestionar)
 <div wire:ignore.self class="modal fade" id="createDataModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
     aria-labelledby="createDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -158,9 +163,9 @@
         </div>
     </div>
 </div>
-@endcan
+@endif
 
-<!-- Edit Modal -->
+<!-- Edit Modal - Solo Super Admin -->
 @can('gestionar usuarios')
 <div wire:ignore.self class="modal fade" id="updateDataModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
     aria-labelledby="updateModalLabel" aria-hidden="true">
@@ -183,7 +188,7 @@
             <div class="modal-body p-4">
                 <form>
                     <input type="hidden" wire:model="selected_id">
-                    
+
                     <!-- Nombre -->
                     <div class="mb-3">
                         <label for="name_update" class="form-label fw-semibold">
@@ -194,9 +199,9 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-person-fill text-muted"></i>
                             </span>
-                            <input wire:model="name" type="text" 
-                                   class="form-control border-start-0 @error('name') is-invalid @enderror" 
-                                   id="name_update" 
+                            <input wire:model="name" type="text"
+                                   class="form-control border-start-0 @error('name') is-invalid @enderror"
+                                   id="name_update"
                                    placeholder="Nombre completo">
                         </div>
                         @error('name')
@@ -216,8 +221,8 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-envelope-at text-muted"></i>
                             </span>
-                            <input wire:model="email" type="email" 
-                                   class="form-control border-start-0 @error('email') is-invalid @enderror" 
+                            <input wire:model="email" type="email"
+                                   class="form-control border-start-0 @error('email') is-invalid @enderror"
                                    id="email_update"
                                    placeholder="Correo electrónico">
                         </div>
@@ -236,7 +241,7 @@
                         data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-2"></i>Cancelar
                 </button>
-                <button type="button" wire:click.prevent="update()" 
+                <button type="button" wire:click.prevent="update()"
                         class="btn text-white px-4"
                         style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);">
                     <i class="bi bi-check-circle me-2"></i>Actualizar Docente
@@ -308,7 +313,11 @@
 @endcan
 
 <!-- Import Profesores Modal -->
-@can('importar profesores')
+@php
+    $puedeImportar = (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && $user->can('importar profesores'))
+                    || \App\Helpers\ContextualAuth::hasActiveAssignments($user);
+@endphp
+@if($puedeImportar)
 <div wire:ignore.self class="modal fade" id="importProfesoresModal" data-bs-backdrop="static" tabindex="-1"
     role="dialog" aria-labelledby="importProfesoresModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -460,4 +469,4 @@
         </div>
     </div>
 </div>
-@endcan
+@endif

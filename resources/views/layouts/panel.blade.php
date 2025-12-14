@@ -1163,12 +1163,22 @@
                             </li>
                         @endif
 
-                        {{-- Tribunales: Solo Director/Apoyo/Docentes - NO Super Admin --}}
+                        {{-- Calificación: Solo Director/Apoyo/Docentes - NO Super Admin --}}
                         @if ($puedeVerTribunales)
                             <li class="sidebar-menu-item">
                                 <a href="{{ route('tribunales.principal') }}" class="sidebar-menu-link {{ Request::is('tribunales*') ? 'active' : '' }}">
-                                    <i class="bi bi-person-lines-fill"></i>
-                                    <span>Tribunales</span>
+                                    <i class="bi bi-clipboard-check"></i>
+                                    <span>Calificación</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Docentes: Director/Apoyo pueden gestionar docentes --}}
+                        @if (!$isSuperAdminOrAdmin && ($esDirectorCarrera || $esDocenteApoyo))
+                            <li class="sidebar-menu-item">
+                                <a href="{{ route('users.') }}" class="sidebar-menu-link {{ Request::is('users*') || Request::is('docentes*') ? 'active' : '' }}">
+                                    <i class="bi bi-people-fill"></i>
+                                    <span>Docentes</span>
                                 </a>
                             </li>
                         @endif

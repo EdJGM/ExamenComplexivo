@@ -77,9 +77,19 @@ class Users extends Component
      */
     private function verificarAccesoUsuarios()
     {
-        if (!Gate::allows('gestionar usuarios')) {
-            abort(403, 'No tienes permisos para acceder a la gestión de usuarios.');
+        $user = auth()->user();
+
+        // Super Admin o Admin con permiso
+        if (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && Gate::allows('gestionar usuarios')) {
+            return;
         }
+
+        // Director de Carrera o Docente de Apoyo tienen acceso contextual
+        if (\App\Helpers\ContextualAuth::hasActiveAssignments($user)) {
+            return;
+        }
+
+        abort(403, 'No tienes permisos para acceder a la gestión de usuarios.');
     }
 
     /**
@@ -87,7 +97,19 @@ class Users extends Component
      */
     private function puedeGestionarUsuarios()
     {
-        return Gate::allows('gestionar usuarios');
+        $user = auth()->user();
+
+        // Super Admin o Admin con permiso
+        if (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && Gate::allows('gestionar usuarios')) {
+            return true;
+        }
+
+        // Director de Carrera o Docente de Apoyo pueden gestionar usuarios
+        if (\App\Helpers\ContextualAuth::hasActiveAssignments($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -95,7 +117,19 @@ class Users extends Component
      */
     private function puedeImportarProfesores()
     {
-        return Gate::allows('importar profesores');
+        $user = auth()->user();
+
+        // Super Admin o Admin con permiso
+        if (\App\Helpers\ContextualAuth::isSuperAdminOrAdmin($user) && Gate::allows('importar profesores')) {
+            return true;
+        }
+
+        // Director de Carrera o Docente de Apoyo pueden importar profesores
+        if (\App\Helpers\ContextualAuth::hasActiveAssignments($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

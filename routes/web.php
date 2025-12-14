@@ -58,11 +58,13 @@ Route::middleware('auth')->group(function () {
         Route::view('/', 'livewire.permissions.index');
     });
 
-    // === USUARIOS/PROFESORES (Super Admin y Administrador) ===
-    Route::middleware(['permission:gestionar usuarios'])->prefix('users')->namespace('Users')->name('users.')->group(function () {
+    // === USUARIOS/PROFESORES (Super Admin, Administrador, Director, Docente de Apoyo) ===
+    Route::prefix('users')->namespace('Users')->name('users.')->group(function () {
+        // Verificación de permisos básicos - la verificación contextual se hará en los componentes Livewire
         Route::view('/', 'livewire.users.index');
         Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
-        Route::put('/updateRoles/{id}', [UserController::class, 'updateRoles'])->name('updateRoles');
+        // Solo Super Admin puede cambiar roles
+        Route::middleware(['permission:gestionar roles y permisos'])->put('/updateRoles/{id}', [UserController::class, 'updateRoles'])->name('updateRoles');
         Route::get('/exitImpersonate/', [UserController::class, 'exitImpersonate'])->name('exitImpersonate');
     });
 

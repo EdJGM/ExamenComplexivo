@@ -107,10 +107,17 @@
                         <!-- Botones de Acción -->
                         <div class="mt-auto">
                             <div class="d-grid gap-2">
-                                <a href="{{ route('periodos.tribunales.index', ['carreraPeriodoId' => $periodoCarrera->id]) }}"
-                                   class="btn btn-outline-info">
-                                    <i class="bi bi-people me-2"></i>Ver Tribunales
-                                </a>
+                                @php
+                                    // El Super Admin no debe ver la opción de tribunales ya que no se encarga de calificaciones
+                                    $canViewTribunales = !$user->hasRole('Super Admin');
+                                @endphp
+
+                                @if($canViewTribunales)
+                                    <a href="{{ route('periodos.tribunales.index', ['carreraPeriodoId' => $periodoCarrera->id]) }}"
+                                       class="btn btn-outline-info">
+                                        <i class="bi bi-people me-2"></i>Ver Tribunales
+                                    </a>
+                                @endif
 
                                 @if($canManageCarrerasPeriodos)
                                     <div class="btn-group" role="group">
