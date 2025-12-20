@@ -193,7 +193,7 @@
                                                 }
                                             @endphp
                                             <option value="{{ $profesor->id }}" {{ $isDisabled ? 'disabled' : '' }}>
-                                                {{ $profesor->name }}
+                                                {{ $profesor->name }} {{ $profesor->lastname }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -244,11 +244,19 @@
                 </div>
                 <div class="col-md-4 text-end">
                     @if ($puedeGestionar)
-                        <button type="button" class="btn text-white"
-                                data-bs-toggle="modal" data-bs-target="#createDataModal"
-                                style="background: linear-gradient(135deg, #2d7a5f 0%, #1a4d30 100%);">
-                            <i class="bi bi-plus-circle me-2"></i>Añadir Tribunal
-                        </button>
+                        <div class="d-inline-flex align-items-center">
+                            <button type="button" class="btn text-white me-2"
+                                    wire:click="abrirModalImportacion"
+                                    data-bs-toggle="modal" data-bs-target="#importarTribunalesModal"
+                                    style="background: linear-gradient(135deg, #2d7a5f 0%, #1a4d30 100%);">
+                                <i class="bi bi-file-earmark-excel me-2"></i>Importar desde Excel
+                            </button>
+                            <button type="button" class="btn text-white"
+                                    data-bs-toggle="modal" data-bs-target="#createDataModal"
+                                    style="background: linear-gradient(135deg, #2d7a5f 0%, #1a4d30 100%);">
+                                <i class="bi bi-plus-circle me-2"></i>Añadir Tribunal
+                            </button>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -285,7 +293,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                         <tr>
-                            <th style="width: 50px;" class="text-center">#</th>
+                            <th style="width: 100px;">Tribunal</th>
                             <th wire:click="sortBy('estudiante')" class="sortable-header">
                                 <i class="bi bi-person me-1"></i>Estudiante
                                 <span class="sort-icon">
@@ -304,6 +312,7 @@
                                     <i class="bi {{ $this->getSortIcon('hora_inicio') }}"></i>
                                 </span>
                             </th>
+                            <th style="width: 80px;" class="text-center">Lab.</th>
                             <th>Miembros del Tribunal</th>
                             <th style="width: 100px;" class="text-center">Estado</th>
                             <th style="width: 180px;" class="text-center">Acciones</th>
@@ -312,7 +321,9 @@
                     <tbody>
                         @forelse($tribunales as $row)
                             <tr style="border-bottom: 1px solid #f0f0f0;">
-                                <td class="text-center text-muted">{{ $loop->iteration }}</td>
+                                <td>
+                                    <span class="badge bg-primary">Tribunal {{ $loop->iteration }}</span>
+                                </td>
                                 <td>
                                     <div class="fw-semibold" style="color: #333;">
                                         {{ $row->estudiante->nombres }} {{ $row->estudiante->apellidos }}
@@ -328,6 +339,13 @@
                                         {{ \Carbon\Carbon::parse($row->hora_fin)->format('H:i') }}
                                     </small>
                                 </td>
+                                <td class="text-center">
+                                    @if($row->laboratorio)
+                                        <span class="badge bg-secondary">{{ $row->laboratorio }}</span>
+                                    @else
+                                        <small class="text-muted">-</small>
+                                    @endif
+                                </td>
                                 <td>
                                     @foreach ($row->miembrosTribunales as $miembro)
                                         <span class="badge
@@ -336,7 +354,7 @@
                                             @elseif($miembro->status == 'INTEGRANTE2') bg-secondary
                                             @else bg-primary @endif
                                             mb-1 me-1" style="font-size: 10px;">
-                                            {{ $miembro->user->name }}
+                                            {{ $miembro->user->name }} {{ $miembro->user->lastname }}
                                             ({{ Str::ucfirst(Str::lower(Str::replaceFirst('INTEGRANTE', 'Int. ', $miembro->status))) }})
                                         </span>
                                     @endforeach

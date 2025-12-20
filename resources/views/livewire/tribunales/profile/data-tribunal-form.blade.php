@@ -198,7 +198,7 @@
                                 @else style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); font-size: 13px; min-width: 100px; text-align: center;" @endif>
                                 {{ Str::title(Str::lower(Str_replace('_', ' ', $miembro->status))) }}
                             </span>
-                            <span class="fw-semibold">{{ $miembro->user->name }}</span>
+                            <span class="fw-semibold">{{ $miembro->user->name }} {{ $miembro->user->lastname }}</span>
                         </li>
                     @endforeach
                 </ul>

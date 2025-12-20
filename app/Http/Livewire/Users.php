@@ -19,7 +19,7 @@ class Users extends Component
     use WithPagination, WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
-    public $selected_id, $keyWord, $name, $email, $password, $password_confirmation;
+    public $selected_id, $keyWord, $name, $lastname, $email, $password, $password_confirmation;
     public $departamento_id; // Departamento al que pertenece el docente
     public $usuarioFounded;
     public $archivoExcelProfesores;
@@ -33,14 +33,18 @@ class Users extends Component
     protected function rules()
     {
         return [
-            'name' => 'required|min:6',
+            'name' => 'required|min:3',
+            'lastname' => 'required|min:3',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', 'min:6', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
         ];
     }
 
     protected $messages = [
-        'name.required' => 'El campo de Nombre no puede estar vacío.',
+        'name.required' => 'El campo de Nombres no puede estar vacío.',
+        'name.min' => 'Los nombres deben tener al menos 3 caracteres.',
+        'lastname.required' => 'El campo de Apellidos no puede estar vacío.',
+        'lastname.min' => 'Los apellidos deben tener al menos 3 caracteres.',
         'email.required' => 'El campo de Email no puede estar vacío.',
         'email.email' => 'Ingrese un email válido.',
         'email.unique' => 'El email ya está en uso.',
@@ -177,6 +181,7 @@ class Users extends Component
     private function resetInput()
     {
         $this->name = null;
+        $this->lastname = null;
         $this->email = null;
         $this->password = null;
         $this->password_confirmation = null;
@@ -196,6 +201,7 @@ class Users extends Component
         try {
             $user = new User();
             $user->name = $this->name;
+            $user->lastname = $this->lastname;
             $user->email = $this->email;
             $user->password = Hash::make($this->password);
             $user->departamento_id = $this->departamento_id; // Opcional: solo para docentes

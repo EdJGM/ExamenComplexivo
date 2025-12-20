@@ -47,8 +47,8 @@ class ProfesoresImport implements ToCollection, WithHeadingRow, WithValidation, 
                 ],
                 [
                     // Datos a crear o actualizar
-                    'name'      => trim($row['nombres']) . ' ' . trim($row['apellidos']),
-                    'lastname'  => trim($row['apellidos']),
+                    'name'      => trim($row['nombres']), // Solo nombres
+                    'lastname'  => trim($row['apellidos']), // Solo apellidos
                     'username'  => $this->generarUsername($row['correo']),
                     'email'     => trim($row['correo']),
                     'cedula'    => trim($row['cedula']),

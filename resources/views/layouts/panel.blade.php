@@ -1215,6 +1215,12 @@
                                     <span>Permisos</span>
                                 </a>
                             </li>
+                            <li class="sidebar-menu-item">
+                                <a href="{{ route('plantillas_acta.index') }}" class="sidebar-menu-link {{ Request::is('plantillas-acta*') ? 'active' : '' }}">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>Plantillas de Acta</span>
+                                </a>
+                            </li>
                         </ul>
                     @endif
 
@@ -1265,7 +1271,7 @@
                             </div>
                             <div class="text-end me-2">
                                 <div class="fw-semibold" style="font-size: 14px; color: #333;">
-                                    {{ Auth::user()->name }}
+                                    {{ Auth::user()->name }} {{ Auth::user()->lastname }}
                                 </div>
                                 <small class="text-muted" style="font-size: 11px;">
                                     @php

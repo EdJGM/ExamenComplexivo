@@ -89,7 +89,8 @@
                                         @foreach ($usuariosAgrupados as $departamento => $usuarios)
                                             <optgroup label="📁 {{ $departamento }}">
                                                 @foreach ($usuarios as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                <!-- mostrar nombre apelleido -->
+                                                    <option value="{{ $user->id }}">{{ $user->name }} {{ $user->lastname }}</option>
                                                 @endforeach
                                             </optgroup>
                                         @endforeach
@@ -135,7 +136,7 @@
                                         @foreach ($usuariosApoyoAgrupados as $departamento => $usuarios)
                                             <optgroup label="📁 {{ $departamento }}">
                                                 @foreach ($usuarios as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                    <option value="{{ $user->id }}">{{ $user->name }} {{ $user->lastname }}</option>
                                                 @endforeach
                                             </optgroup>
                                         @endforeach

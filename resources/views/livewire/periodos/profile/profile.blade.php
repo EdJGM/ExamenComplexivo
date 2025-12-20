@@ -92,7 +92,7 @@
                                     <i class="bi bi-person-badge text-success me-1"></i>
                                     <strong>Director:</strong>
                                 </small>
-                                <div class="ms-3">{{ $periodoCarrera->director->name }}</div>
+                                <div class="ms-3">{{ $periodoCarrera->director->name }} {{ $periodoCarrera->director->lastname }} </div>
                             </div>
 
                             <div class="p-2 rounded" style="background-color: #f8f9fa;">
@@ -100,7 +100,7 @@
                                     <i class="bi bi-person-check text-info me-1"></i>
                                     <strong>Docente Apoyo:</strong>
                                 </small>
-                                <div class="ms-3">{{ $periodoCarrera->docenteApoyo->name }}</div>
+                                <class class="ms-3">{{ $periodoCarrera->docenteApoyo->name }} {{ $periodoCarrera->docenteApoyo->lastname }} </class>
                             </div>
                         </div>
 

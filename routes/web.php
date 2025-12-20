@@ -112,6 +112,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/manage/{carreraPeriodoId}', [PlanEvaluacionController::class, 'manage'])->name('manage');
     });
 
+    // === PLANTILLAS DE ACTA (Solo Super Admin) ===
+    Route::middleware(['role:Super Admin'])->prefix('plantillas-acta')->name('plantillas_acta.')->group(function () {
+        Route::view('/', 'livewire.plantillas-acta.index')->name('index');
+    });
+
     // Ruta para descargar archivos PDF temporales
     Route::get('/download-temp-pdf/{filename}', function ($filename) {
         $path = storage_path('app/temp/' . $filename);

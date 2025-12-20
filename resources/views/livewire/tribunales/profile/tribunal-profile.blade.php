@@ -210,7 +210,7 @@
                                         <small class="text-muted">
                                             {{ $log->created_at->isoFormat('DD MMM YYYY, hh:mm A') }}
                                             @if ($log->user)
-                                                por <strong>{{ $log->user->name }}</strong>
+                                                por <strong>{{ $log->user->name }} {{ $log->user->lastname }}</strong>
                                             @else
                                                 (Sistema)
                                             @endif

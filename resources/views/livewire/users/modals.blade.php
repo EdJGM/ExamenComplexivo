@@ -25,27 +25,56 @@
             <!-- Body -->
             <div class="modal-body p-4">
                 <form>
-                    <!-- Nombre -->
-                    <div class="mb-3">
-                        <label for="name_create" class="form-label fw-semibold">
-                            <i class="bi bi-person text-primary me-1"></i>Nombre Completo
-                            <span class="text-danger">*</span>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="bi bi-person-fill text-muted"></i>
-                            </span>
-                            <input type="text" 
-                                   class="form-control border-start-0 @error('name') is-invalid @enderror" 
-                                   wire:model="name"
-                                   id="name_create"
-                                   placeholder="Ej: Juan Vásquez">
-                        </div>
-                        @error('name')
-                            <div class="text-danger small mt-1">
-                                <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Nombres -->
+                            <div class="mb-3">
+                                <label for="name_create" class="form-label fw-semibold">
+                                    <i class="bi bi-person text-primary me-1"></i>Nombres
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-person-fill text-muted"></i>
+                                    </span>
+                                    <input type="text"
+                                           class="form-control border-start-0 @error('name') is-invalid @enderror"
+                                           wire:model="name"
+                                           id="name_create"
+                                           placeholder="Ej: Juan Carlos">
+                                </div>
+                                @error('name')
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}
+                                    </div>
+                                @enderror
                             </div>
-                        @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <!-- Apellidos -->
+                            <div class="mb-3">
+                                <label for="lastname_create" class="form-label fw-semibold">
+                                    <i class="bi bi-person-badge text-primary me-1"></i>Apellidos
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-person-badge-fill text-muted"></i>
+                                    </span>
+                                    <input type="text"
+                                           class="form-control border-start-0 @error('lastname') is-invalid @enderror"
+                                           wire:model="lastname"
+                                           id="lastname_create"
+                                           placeholder="Ej: Pérez López">
+                                </div>
+                                @error('lastname')
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Correo -->

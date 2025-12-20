@@ -13,6 +13,8 @@ use App\Models\MiembrosTribunale;    // Para iterar sobre los miembros del tribu
 use App\Models\MiembroCalificacion;  // Para obtener las calificaciones
 use App\Models\MiembrosTribunal;
 use App\Models\TribunalLog;         // Para el historial
+use App\Models\PlantillaActa;       // Para plantillas personalizadas
+use App\Helpers\PlantillaActaHelper; // Para reemplazo de variables
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -698,6 +700,7 @@ class TribunalProfile extends Component
 
                                 $calificacionesPorUsuarioParaEsteComponente[$userIdCalificador] = [
                                     'nombre_usuario' => $datosMiembro['nombre_miembro'],
+                                    'apellido_usuario' => User::find($userIdCalificador)?->lastname ?? '',
                                     'rol_evaluador' => $datosMiembro['rol_miembro'], // El rol que tenía al calificar
                                     'criterios_evaluados' => $criteriosFormateados,
                                     // Podrías añadir la observación general del ítem por este miembro aquí si es relevante para el componente
@@ -790,7 +793,7 @@ class TribunalProfile extends Component
             $notaFinalCalculadaDelTribunal = $this->notaFinalCalculadaDelTribunal;
 
             // Convertir logo a base64 para que funcione en PDF
-            $logoPath = public_path('storage/logos/LOGO-ESPE_500.png');
+            $logoPath = public_path('storage/logos/LOGO-ESPE_lg.png');
             $logoBase64 = null;
             if (file_exists($logoPath)) {
                 $logoData = file_get_contents($logoPath);
@@ -814,18 +817,53 @@ class TribunalProfile extends Component
             $dompdf = new Dompdf($options);
 
             try {
-                // Renderizar la vista como HTML
-                $html = view('pdfs.acta-tribunal', compact(
-                    'tribunal',
-                    'planEvaluacionActivo',
-                    'resumenNotasCalculadas',
-                    'todasLasCalificacionesDelTribunal',
-                    'notaFinalCalculadaDelTribunal',
-                    'logoBase64'
-                ))->render();
+                // ===== SISTEMA DE PLANTILLAS =====
+                // Buscar si hay una plantilla activa
+                $plantillaActiva = PlantillaActa::obtenerPlantillaActiva();
 
-                // Limpiar el HTML de caracteres problemáticos
-                $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+                if ($plantillaActiva) {
+                    // ===== USAR PLANTILLA PERSONALIZADA =====
+                    // Preparar datos para el reemplazo de variables
+                    $datosAdicionales = [
+                        'planEvaluacionActivo' => $planEvaluacionActivo,
+                        'resumenNotasCalculadas' => $resumenNotasCalculadas,
+                        'todasLasCalificacionesDelTribunal' => $todasLasCalificacionesDelTribunal,
+                        'notaFinalCalculadaDelTribunal' => $notaFinalCalculadaDelTribunal,
+                    ];
+
+                    // Reemplazar variables en el contenido HTML
+                    $contenidoHtml = PlantillaActaHelper::reemplazarVariables(
+                        $plantillaActiva->contenido_html,
+                        $tribunal,
+                        $datosAdicionales
+                    );
+
+                    // Agregar estilos CSS si existen
+                    $estilosAdicionales = '';
+                    if (!empty($plantillaActiva->estilos_css)) {
+                        $estilosAdicionales = '<style>' . $plantillaActiva->estilos_css . '</style>';
+                    }
+
+                    // Construir el HTML completo
+                    $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">' . $estilosAdicionales . '</head><body>' . $contenidoHtml . '</body></html>';
+
+                    // Limpiar el HTML de caracteres problemáticos
+                    $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+                } else {
+                    // ===== USAR VISTA BLADE POR DEFECTO (CÓDIGO ORIGINAL - NO ROMPE NADA) =====
+                    // Si no hay plantilla activa, usar la vista blade como siempre
+                    $html = view('pdfs.acta-tribunal', compact(
+                        'tribunal',
+                        'planEvaluacionActivo',
+                        'resumenNotasCalculadas',
+                        'todasLasCalificacionesDelTribunal',
+                        'notaFinalCalculadaDelTribunal',
+                        'logoBase64'
+                    ))->render();
+
+                    // Limpiar el HTML de caracteres problemáticos
+                    $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+                }
 
                 $dompdf->loadHtml($html);
                 $dompdf->setPaper('A4', 'portrait');
