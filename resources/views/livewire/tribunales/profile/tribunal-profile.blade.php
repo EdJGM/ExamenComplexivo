@@ -237,16 +237,54 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <p class="mb-3">El acta oficial del tribunal está disponible para exportación.</p>
-                            <button class="btn text-white px-4 py-2" wire:click="exportarActa" wire:loading.attr="disabled"
-                                    style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: none; transition: all 0.3s ease; font-weight: 600;"
-                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(220,53,69,0.4)'"
-                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-                                <span wire:loading wire:target="exportarActa" class="spinner-border spinner-border-sm me-2"
-                                    role="status" aria-hidden="true"></span>
-                                <i class="bi bi-file-pdf-fill me-2" wire:loading.remove wire:target="exportarActa"></i>
-                                Exportar Acta (PDF)
-                            </button>
+                            <p class="mb-3">El acta oficial del tribunal está disponible para exportación en diferentes formatos.</p>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                {{-- Botón PDF Hardcodeado (actual) --}}
+                                <button class="btn text-white px-4 py-2" wire:click="exportarActa" wire:loading.attr="disabled"
+                                        style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: none; transition: all 0.3s ease; font-weight: 600;"
+                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(220,53,69,0.4)'"
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                        title="Exportar usando plantilla hardcodeada (siempre disponible)">
+                                    <span wire:loading wire:target="exportarActa" class="spinner-border spinner-border-sm me-2"
+                                        role="status" aria-hidden="true"></span>
+                                    <i class="bi bi-file-pdf-fill me-2" wire:loading.remove wire:target="exportarActa"></i>
+                                    PDF (Hardcodeado)
+                                </button>
+
+                                {{-- Botón Word --}}
+                                <button class="btn text-white px-4 py-2" wire:click="exportarActaWord" wire:loading.attr="disabled"
+                                        style="background: linear-gradient(135deg, #2b5797 0%, #1e3a5f 100%); border: none; transition: all 0.3s ease; font-weight: 600;"
+                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(43,87,151,0.4)'"
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                        title="Exportar Word usando plantilla personalizada">
+                                    <span wire:loading wire:target="exportarActaWord" class="spinner-border spinner-border-sm me-2"
+                                        role="status" aria-hidden="true"></span>
+                                    <i class="bi bi-file-word-fill me-2" wire:loading.remove wire:target="exportarActaWord"></i>
+                                    Word (Plantilla)
+                                </button>
+
+                                {{-- Botón PDF desde Word --}}
+                                <button class="btn text-white px-4 py-2" wire:click="exportarActaPdfDesdeWord" wire:loading.attr="disabled"
+                                        style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); border: none; transition: all 0.3s ease; font-weight: 600;"
+                                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(40,167,69,0.4)'"
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                        title="Exportar PDF convertido desde plantilla Word">
+                                    <span wire:loading wire:target="exportarActaPdfDesdeWord" class="spinner-border spinner-border-sm me-2"
+                                        role="status" aria-hidden="true"></span>
+                                    <i class="bi bi-file-earmark-pdf-fill me-2" wire:loading.remove wire:target="exportarActaPdfDesdeWord"></i>
+                                    PDF (desde Word)
+                                </button>
+                            </div>
+
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <strong>PDF (Hardcodeado):</strong> Usa plantilla fija del sistema.
+                                    <strong>Word:</strong> Usa plantilla personalizada (.docx).
+                                    <strong>PDF (desde Word):</strong> Convierte plantilla Word a PDF.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 @elseif($tribunal && $tribunal->estado !== 'CERRADO')

@@ -1216,9 +1216,9 @@
                                 </a>
                             </li>
                             <li class="sidebar-menu-item">
-                                <a href="{{ route('plantillas_acta.index') }}" class="sidebar-menu-link {{ Request::is('plantillas-acta*') ? 'active' : '' }}">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                    <span>Plantillas de Acta</span>
+                                <a href="{{ route('plantillas_acta_word.index') }}" class="sidebar-menu-link {{ Request::is('plantillas-acta-word*') ? 'active' : '' }}">
+                                    <i class="bi bi-file-earmark-word"></i>
+                                    <span>Plantillas Acta Word</span>
                                 </a>
                             </li>
                         </ul>
