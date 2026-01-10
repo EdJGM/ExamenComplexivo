@@ -201,7 +201,7 @@
                                     @endphp
                                     <tr style="border-bottom: 1px solid #f0f0f0;">
                                         <td class="text-center text-muted">{{ $loop->iteration }}</td>
-                                        <td class="fw-semibold">{{ $row->name }}</td>
+                                        <td class="fw-semibold">{{ $row->name }} {{ $row->lastname }}</td>
                                         <td>
                                             <small class="text-muted">
                                                 <i class="bi bi-envelope-at me-1"></i>{{ $row->email }}

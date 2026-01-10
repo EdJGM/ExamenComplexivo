@@ -109,6 +109,9 @@
                                             </small>
                                         </td>
                                         <td class="text-center">
+                                            @php
+                                                $tieneCarreras = $row->carrerasPeriodos()->exists();
+                                            @endphp
                                             <div class="btn-group btn-group-sm" role="group">
                                                 <button class="btn btn-outline-info"
                                                         wire:click="open({{ $row->id }})"
@@ -116,20 +119,31 @@
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                                 @can('gestionar periodos')
-                                                    <button class="btn btn-outline-primary"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#updateDataModal"
-                                                            wire:click="edit({{ $row->id }})"
-                                                            title="Editar">
-                                                        <i class="bi bi-pencil-square"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#deleteDataModal"
-                                                            wire:click="eliminar({{ $row->id }})"
-                                                            title="Eliminar">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
+                                                    @if($tieneCarreras)
+                                                        <button class="btn btn-outline-secondary" disabled
+                                                                title="No se puede editar porque tiene carreras asociadas">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-secondary" disabled
+                                                                title="No se puede eliminar porque tiene carreras asociadas">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @else
+                                                        <button class="btn btn-outline-primary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#updateDataModal"
+                                                                wire:click="edit({{ $row->id }})"
+                                                                title="Editar">
+                                                            <i class="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#deleteDataModal"
+                                                                wire:click="eliminar({{ $row->id }})"
+                                                                title="Eliminar">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 @else
                                                     <span class="badge bg-secondary">Solo lectura</span>
                                                 @endcan

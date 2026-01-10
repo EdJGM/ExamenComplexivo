@@ -925,6 +925,17 @@ class Tribunales extends Component
             return;
         }
 
+        // Validar que el tribunal esté dentro de su franja horaria
+        $fechaHoraActual = now();
+        $fechaHoraFinTribunal = \Carbon\Carbon::parse($tribunal->fecha . ' ' . $tribunal->hora_fin);
+
+        if ($fechaHoraActual->greaterThan($fechaHoraFinTribunal)) {
+            session()->flash('warning', 'No se puede abrir el tribunal. La franja horaria ya ha finalizado (' .
+                $fechaHoraFinTribunal->format('d/m/Y H:i') . ').');
+            $this->dispatchBrowserEvent('showFlashMessage');
+            return;
+        }
+
         DB::transaction(function () use ($tribunal) {
             $tribunal->update(['estado' => 'ABIERTO']);
 

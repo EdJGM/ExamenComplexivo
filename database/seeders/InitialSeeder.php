@@ -73,7 +73,7 @@ class InitialSeeder extends Seeder // O RolesAndPermissionsSeeder
                 'Mecánica'
             ],
             'Ciencias de la Computación' => [
-                'Ingeniería de Software',
+                'Software',
                 'Tecnologías de la Información'
             ],
             'Eléctrica, Electrónica y Telecomunicaciones' => [
@@ -127,7 +127,7 @@ class InitialSeeder extends Seeder // O RolesAndPermissionsSeeder
             'Turismo',
             'Tecnologías de la Información',
             'Pedagogía de los Idiomas Nacionales y Extranjeros',
-            'Ingeniería de Software'
+            'Software'
         ];
 
         // Contador para generar códigos de carrera únicos

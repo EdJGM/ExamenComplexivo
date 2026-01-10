@@ -15,7 +15,7 @@
                     @endif
                     <div>
                         <h1 class="h3 mb-1 fw-bold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                            PLANTILLAS DE ACTA (WORD)
+                            PLANTILLAS DE ACTA
                         </h1>
                         <p class="mb-0 text-white" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                             Gestión de plantillas Word con variables dinámicas
@@ -98,7 +98,7 @@
                                         <td class="text-center">
                                             @if($plantilla->activa)
                                                 <span class="badge bg-success px-3 py-2">
-                                                    <i class="bi bi-check-circle me-1"></i>ACTIVA
+                                                    <i class="bi bi-check-circle me-1"></i>Activa
                                                 </span>
                                             @else
                                                 <span class="badge bg-secondary px-3 py-2">
@@ -116,7 +116,7 @@
                                                     </button>
                                                 @else
                                                     <button wire:click="desactivar({{ $plantilla->id }})"
-                                                            class="btn btn-sm btn-warning"
+                                                            class="btn btn-sm btn-danger"
                                                             title="Desactivar plantilla">
                                                         <i class="bi bi-x-circle"></i>
                                                     </button>
@@ -151,32 +151,6 @@
                         {{ $plantillas->links() }}
                     </div>
                 @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Info de Variables Disponibles -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header" style="background: linear-gradient(135deg, #3d8e72ff 0%, #3da66aff 100%);">
-                    <h6 class="mb-0 text-white">
-                        <i class="bi bi-info-circle me-2"></i>Variables Disponibles para las Plantillas
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-3">
-                        En tu archivo Word, usa las siguientes variables. Serán reemplazadas automáticamente al generar el acta:
-                    </p>
-                    <div class="row">
-                        @foreach($variablesDisponibles as $variable => $descripcion)
-                            <div class="col-md-6 col-lg-4 mb-2">
-                                <code class="text-primary">{{ $variable }}</code>
-                                <small class="text-muted d-block">{{ $descripcion }}</small>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
             </div>
         </div>
     </div>

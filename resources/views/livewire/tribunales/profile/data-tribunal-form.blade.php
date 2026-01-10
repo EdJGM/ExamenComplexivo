@@ -30,15 +30,27 @@
                             <i class="bi bi-lock-fill me-1"></i>Cerrar Tribunal
                         </button>
                     @else
-                        <button class="btn btn-sm btn-outline-success"
-                            wire:click="abrirTribunal"
-                            wire:confirm="¿Está seguro que desea abrir este tribunal? Al abrirlo, se permitirán modificaciones y evaluaciones."
-                            wire:loading.attr="disabled"
-                            style="transition: all 0.3s ease;"
-                            onmouseover="this.style.transform='translateY(-2px)'"
-                            onmouseout="this.style.transform='translateY(0)'">
-                            <i class="bi bi-unlock-fill me-1"></i>Abrir Tribunal
-                        </button>
+                        @php
+                            $fechaHoraFin = \Carbon\Carbon::parse($tribunal->fecha . ' ' . $tribunal->hora_fin);
+                            $yaFinalizo = now()->greaterThan($fechaHoraFin);
+                        @endphp
+                        @if($yaFinalizo)
+                            <button class="btn btn-sm btn-outline-secondary" disabled
+                                title="No se puede abrir. La franja horaria finalizó el {{ $fechaHoraFin->format('d/m/Y H:i') }}">
+                                <i class="bi bi-unlock-fill me-1"></i>Abrir Tribunal
+                                <small class="ms-1">(Finalizado)</small>
+                            </button>
+                        @else
+                            <button class="btn btn-sm btn-outline-success"
+                                wire:click="abrirTribunal"
+                                wire:confirm="¿Está seguro que desea abrir este tribunal? Al abrirlo, se permitirán modificaciones y evaluaciones."
+                                wire:loading.attr="disabled"
+                                style="transition: all 0.3s ease;"
+                                onmouseover="this.style.transform='translateY(-2px)'"
+                                onmouseout="this.style.transform='translateY(0)'">
+                                <i class="bi bi-unlock-fill me-1"></i>Abrir Tribunal
+                            </button>
+                        @endif
                     @endif
 
                     {{-- Botón para editar datos --}}
@@ -104,7 +116,7 @@
                             <option value="">Seleccione...</option>
                             @foreach ($profesoresDisponibles as $prof)
                                 <option value="{{ $prof->id }}" @if( ($integrante1_id == $prof->id && !is_null($integrante1_id)) || ($integrante2_id == $prof->id && !is_null($integrante2_id)) ) disabled @endif>
-                                    {{ $prof->name }}
+                                    {{ $prof->name }} {{ $prof->lastname }}
                                 </option>
                             @endforeach
                         </select>
@@ -119,7 +131,7 @@
                             <option value="">Seleccione...</option>
                             @foreach ($profesoresDisponibles as $prof)
                                 <option value="{{ $prof->id }}" @if( ($presidente_id == $prof->id && !is_null($presidente_id)) || ($integrante2_id == $prof->id && !is_null($integrante2_id)) ) disabled @endif>
-                                    {{ $prof->name }}
+                                    {{ $prof->name }} {{ $prof->lastname }}
                                 </option>
                             @endforeach
                         </select>
@@ -134,7 +146,7 @@
                             <option value="">Seleccione...</option>
                             @foreach ($profesoresDisponibles as $prof)
                                 <option value="{{ $prof->id }}" @if( ($presidente_id == $prof->id && !is_null($presidente_id)) || ($integrante1_id == $prof->id && !is_null($integrante1_id)) ) disabled @endif>
-                                    {{ $prof->name }}
+                                    {{ $prof->name }} {{ $prof->lastname }}
                                 </option>
                             @endforeach
                         </select>
@@ -193,8 +205,8 @@
                         <li class="mb-2">
                             <span class="badge px-3 py-2 me-2"
                                 @if($miembro->status == 'PRESIDENTE') style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); font-size: 13px; min-width: 100px; text-align: center;"
-                                @elseif($miembro->status == 'INTEGRANTE1') style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); font-size: 13px; min-width: 100px; text-align: center;"
-                                @elseif($miembro->status == 'INTEGRANTE2') style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); font-size: 13px; min-width: 100px; text-align: center;"
+                                @elseif($miembro->status == 'INTEGRANTE1') style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); font-size: 13px; min-width: 100px; text-align: center;"
+                                @elseif($miembro->status == 'INTEGRANTE2') style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); font-size: 13px; min-width: 100px; text-align: center;"
                                 @else style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); font-size: 13px; min-width: 100px; text-align: center;" @endif>
                                 {{ Str::title(Str::lower(Str_replace('_', ' ', $miembro->status))) }}
                             </span>

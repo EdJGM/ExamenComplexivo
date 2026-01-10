@@ -322,7 +322,11 @@
                         @forelse($tribunales as $row)
                             <tr style="border-bottom: 1px solid #f0f0f0;">
                                 <td>
-                                    <span class="badge bg-primary">Tribunal {{ $loop->iteration }}</span>
+                                    @if($row->nombre_tribunal)
+                                        <span class="badge bg-primary">{{ $row->nombre_tribunal }}</span>
+                                    @else
+                                        <span class="badge bg-primary">Tribunal {{ $loop->iteration }}</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="fw-semibold" style="color: #333;">
@@ -350,8 +354,8 @@
                                     @foreach ($row->miembrosTribunales as $miembro)
                                         <span class="badge
                                             @if ($miembro->status == 'PRESIDENTE') bg-success
-                                            @elseif($miembro->status == 'INTEGRANTE1') bg-info
-                                            @elseif($miembro->status == 'INTEGRANTE2') bg-secondary
+                                            @elseif($miembro->status == 'INTEGRANTE1') bg-success
+                                            @elseif($miembro->status == 'INTEGRANTE2') bg-success
                                             @else bg-primary @endif
                                             mb-1 me-1" style="font-size: 10px;">
                                             {{ $miembro->user->name }} {{ $miembro->user->lastname }}
@@ -386,12 +390,23 @@
                                                     <i class="bi bi-lock"></i>
                                                 </button>
                                             @else
-                                                <button type="button" class="btn btn-outline-success"
-                                                    wire:click="abrirTribunal({{ $row->id }})"
-                                                    wire:confirm="¿Está seguro que desea abrir este tribunal?"
-                                                    title="Abrir Tribunal">
-                                                    <i class="bi bi-unlock"></i>
-                                                </button>
+                                                @php
+                                                    $fechaHoraFin = \Carbon\Carbon::parse($row->fecha . ' ' . $row->hora_fin);
+                                                    $yaFinalizo = now()->greaterThan($fechaHoraFin);
+                                                @endphp
+                                                @if($yaFinalizo)
+                                                    <button type="button" class="btn btn-outline-secondary" disabled
+                                                        title="No se puede abrir. La franja horaria finalizó el {{ $fechaHoraFin->format('d/m/Y H:i') }}">
+                                                        <i class="bi bi-unlock"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-outline-success"
+                                                        wire:click="abrirTribunal({{ $row->id }})"
+                                                        wire:confirm="¿Está seguro que desea abrir este tribunal?"
+                                                        title="Abrir Tribunal">
+                                                        <i class="bi bi-unlock"></i>
+                                                    </button>
+                                                @endif
                                             @endif
 
                                             <button type="button" class="btn btn-outline-danger"
@@ -405,7 +420,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
                                     <p class="text-muted mb-0">No se encontraron tribunales</p>
                                 </td>

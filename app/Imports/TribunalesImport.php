@@ -85,14 +85,16 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
         // Agrupar filas por tribunal
         $tribunalesAgrupados = $this->agruparPorTribunal($rows);
 
-        // Procesar cada tribunal
-        foreach ($tribunalesAgrupados as $nombreTribunal => $filasTribunal) {
+        // Procesar cada tribunal (agrupados por estudiante)
+        foreach ($tribunalesAgrupados as $nombreEstudiante => $filasTribunal) {
             try {
-                $this->procesarTribunal($nombreTribunal, $filasTribunal);
+                $this->procesarTribunal($nombreEstudiante, $filasTribunal);
                 $this->exitosos++;
             } catch (\Exception $e) {
+                // Obtener el nombre del tribunal desde la primera fila para el mensaje de error
+                $nombreTribunal = $filasTribunal[0]['tribunal'] ?? 'Desconocido';
                 $this->errores[] = [
-                    'tribunal' => $nombreTribunal,
+                    'tribunal' => "{$nombreTribunal} - {$nombreEstudiante}",
                     'mensaje' => $e->getMessage()
                 ];
             }
@@ -100,7 +102,7 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
     }
 
     /**
-     * Agrupa las filas del Excel por tribunal
+     * Agrupa las filas del Excel por estudiante (cada estudiante = 1 tribunal con 3 miembros)
      * Maneja celdas combinadas propagando valores de filas anteriores
      */
     protected function agruparPorTribunal(Collection $rows): array
@@ -112,6 +114,7 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
         $ultimoCaso = null;
         $ultimoEstudiante = null;
         $ultimoHorario = null;
+        $ultimoLaboratorio = null;
 
         foreach ($rows as $index => $row) {
             // Validar que la fila tenga datos mínimos (al menos designación y docentes)
@@ -149,6 +152,13 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
                 $horario = $ultimoHorario;
             }
 
+            $laboratorio = trim($row['laboratorio'] ?? '');
+            if (!empty($laboratorio)) {
+                $ultimoLaboratorio = $laboratorio;
+            } else {
+                $laboratorio = $ultimoLaboratorio;
+            }
+
             // Validar que tengamos al menos tribunal y estudiante
             if (empty($tribunal)) {
                 $this->errores[] = [
@@ -174,15 +184,17 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
                 'designacion' => trim($row['designacion'] ?? ''),
                 'docentes' => trim($row['docentes'] ?? ''),
                 'horario' => $horario,
-                'laboratorio' => trim($row['laboratorio'] ?? ''),
+                'laboratorio' => $laboratorio,
                 'firma' => trim($row['firma'] ?? ''),
             ];
 
-            if (!isset($tribunales[$tribunal])) {
-                $tribunales[$tribunal] = [];
+            // CAMBIO CLAVE: Agrupar por ESTUDIANTE, no por TRIBUNAL
+            // Cada estudiante = 1 tribunal con 3 miembros
+            if (!isset($tribunales[$estudiante])) {
+                $tribunales[$estudiante] = [];
             }
 
-            $tribunales[$tribunal][] = $filaCompleta;
+            $tribunales[$estudiante][] = $filaCompleta;
         }
 
         return $tribunales;
@@ -191,15 +203,18 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
     /**
      * Procesa un tribunal individual (3 filas)
      */
-    protected function procesarTribunal(string $nombreTribunal, array $filas)
+    protected function procesarTribunal(string $nombreEstudiante, array $filas)
     {
         // Validar que haya exactamente 3 filas (Presidente + 2 Integrantes)
         if (count($filas) !== 3) {
-            throw new \Exception("El tribunal debe tener exactamente 3 miembros (Presidente, Integrante 1, Integrante 2). Encontrados: " . count($filas));
+            throw new \Exception("El tribunal para '{$nombreEstudiante}' debe tener exactamente 3 miembros (Presidente, Integrante 1, Integrante 2). Encontrados: " . count($filas));
         }
 
         // Extraer datos de la primera fila (datos comunes)
         $primeraFila = $filas[0];
+
+        // Obtener el nombre del tribunal desde la primera fila (ya viene propagado)
+        $nombreTribunal = $primeraFila['tribunal'] ?? null;
 
         // Validar y obtener estudiante
         $estudiante = $this->buscarEstudiante($primeraFila['estudiante'] ?? '');
@@ -244,6 +259,7 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
                 'hora_inicio' => $horarioData['hora_inicio'],
                 'hora_fin' => $horarioData['hora_fin'],
                 'laboratorio' => !empty($laboratorio) ? $laboratorio : null,
+                'nombre_tribunal' => !empty($nombreTribunal) ? $nombreTribunal : null,
                 'estado' => 'ABIERTO',
                 'es_plantilla' => false,
                 'descripcion_plantilla' => null,
@@ -263,7 +279,9 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
                 'tribunal_id' => $tribunal->id,
                 'user_id' => auth()->id(),
                 'accion' => 'TRIBUNAL_CREADO',
-                'descripcion' => "Tribunal '{$nombreTribunal}' importado desde Excel para {$estudiante->getNombreCompleto()}",
+                'descripcion' => $nombreTribunal
+                    ? "Tribunal '{$nombreTribunal}' importado desde Excel para {$estudiante->getNombreCompleto()}"
+                    : "Tribunal importado desde Excel para {$estudiante->getNombreCompleto()}",
             ]);
         });
     }

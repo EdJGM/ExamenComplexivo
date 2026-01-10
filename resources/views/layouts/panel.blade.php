@@ -974,99 +974,29 @@
                     $calificadorGeneralAsignaciones = $userContextInfo['calificador_general'];
                 @endphp
 
-                <!-- Información de Roles Contextuales -->
+                <!-- Información de Rol Global -->
                 <div class="py-3 px-3" style="border-bottom: 1px solid #e0e0e0; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px);">
-                    {{-- SIEMPRE mostrar roles globales si los tiene --}}
-                    @if (ContextualAuth::isSuperAdminOrAdmin(Auth::user()))
-                        <div class="mb-2">
-                            @if (Auth::user()->roles->where('name', 'Super Admin')->isNotEmpty())
-                                <span class="badge bg-danger text-white w-100 py-2" style="font-size: 11px;">
-                                    <i class="bi bi-shield-fill-check me-1"></i>Super Administrador
-                                </span>
-                            @else
-                                <span class="badge bg-warning text-dark w-100 py-2" style="font-size: 11px;">
-                                    <i class="bi bi-shield-check me-1"></i>Administrador
-                                </span>
-                            @endif
+                    @if (Auth::user()->hasRole('Super Admin'))
+                        <div class="mb-0">
+                            <span class="badge bg-danger text-white w-100 py-2" style="font-size: 12px;">
+                                <i class="bi bi-shield-fill-check me-1"></i>Super Administrador
+                            </span>
                         </div>
-                    @endif
-
-                    {{-- Mostrar asignaciones como Director con contexto completo --}}
-                    @if ($esDirectorCarrera)
-                        @foreach ($userContextInfo['carreras_director'] as $carreraDirector)
-                            <div >
-                                <span class="badge bg-success text-white w-100 py-2 text-start" style="white-space: normal; margin-bottom: 2px">
-                                    <span>Director</span><br>
-                                    <span >{{ $carreraDirector->carrera->nombre }} ({{ $carreraDirector->periodo->codigo_periodo }})</span>
-                                </span>
-                            </div>
-                        @endforeach
-                    @endif
-
-                    {{-- Mostrar asignaciones como Docente de Apoyo con contexto completo --}}
-                    @if ($esDocenteApoyo)
-                        @foreach ($userContextInfo['carreras_apoyo'] as $carreraApoyo)
-                            <div class="mb-2">
-                                <span class="badge bg-info text-white w-100 py-2 text-start" style="white-space: normal; margin-bottom: 2px">
-                                    <span>Docente de Apoyo</span><br>
-                                    <span>{{ $carreraApoyo->carrera->nombre }} ({{ $carreraApoyo->periodo->codigo_periodo }})</span>
-                                </span>
-                            </div>
-                        @endforeach
-                    @endif
-
-                    {{-- Mostrar asignaciones como Calificador General con contexto completo --}}
-                    @if ($esCalificadorGeneral)
-                        @foreach ($calificadorGeneralAsignaciones as $calificador)
-                            <div class="mb-2">
-                                <span class="badge bg-warning text-dark w-100 py-2 text-start" style="white-space: normal; margin-bottom: 2px">
-                                    <span>Calificador General</span><br>
-                                    <span>{{ $calificador->carreraPeriodo->carrera->nombre }} ({{ $calificador->carreraPeriodo->periodo->codigo_periodo }})</span>
-                                </span>
-                            </div>
-                        @endforeach
-                    @endif
-
-                    {{-- Mostrar asignaciones en tribunales con contexto completo --}}
-                    @if ($esMiembroTribunal)
-                        @php
-                            // Agrupar tribunales por rol y carrera para evitar repeticiones
-                            $tribunalesAgrupados = collect($tribunalesAsignados)->groupBy(function($tribunal) {
-                                return $tribunal->status . '|' . $tribunal->tribunal->carrerasPeriodo->carrera->nombre;
-                            });
-                        @endphp
-                        @foreach ($tribunalesAgrupados as $key => $grupoTribunales)
-                            @php
-                                $primerTribunal = $grupoTribunales->first();
-                                $cantidad = $grupoTribunales->count();
-                                $rol = ucwords(strtolower($primerTribunal->status));
-                                $carreraNombre = $primerTribunal->tribunal->carrerasPeriodo->carrera->nombre;
-                            @endphp
-                            <div class="mb-2">
-                                <span class="badge bg-primary text-white w-100 py-2 text-start" style="white-space: normal; margin-bottom: 2px">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <span>{{ $rol }}</span>
-                                        @if($cantidad > 1)
-                                            <span class="badge bg-white text-primary ms-2" style="font-size: 10px; padding: 2px 6px;">
-                                                {{ $cantidad }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <span style="font-size: 11px;">{{ $carreraNombre }}</span>
-                                </span>
-                            </div>
-                        @endforeach
-                    @endif
-
-                    {{-- Solo mostrar "Docente" si NO tiene roles globales NI asignaciones contextuales --}}
-                    @if (
-                        !ContextualAuth::isSuperAdminOrAdmin(Auth::user()) &&
-                            !$esDirectorCarrera &&
-                            !$esDocenteApoyo &&
-                            !$esCalificadorGeneral &&
-                            !$esMiembroTribunal)
-                        <div class="mb-2">
-                            <span class="badge bg-secondary text-white w-100 py-2" style="font-size: 11px;">
+                    @elseif (Auth::user()->hasRole('Director de Carrera'))
+                        <div class="mb-0">
+                            <span class="badge bg-success text-white w-100 py-2" style="font-size: 12px;">
+                                <i class="bi bi-person-badge me-1"></i>Director de Carrera
+                            </span>
+                        </div>
+                    @elseif (Auth::user()->hasRole('Docente de Apoyo'))
+                        <div class="mb-0">
+                            <span class="badge bg-info text-white w-100 py-2" style="font-size: 12px;">
+                                <i class="bi bi-person-check me-1"></i>Docente de Apoyo
+                            </span>
+                        </div>
+                    @else
+                        <div class="mb-0">
+                            <span class="badge bg-secondary text-white w-100 py-2" style="font-size: 12px;">
                                 <i class="bi bi-person me-1"></i>Docente
                             </span>
                         </div>
@@ -1076,7 +1006,7 @@
                 <!-- Contenido del Menú -->
                 <div style="flex: 1; overflow-y: auto;">
                     <!-- Categoría MAIN -->
-                    <div class="menu-category">MAIN</div>
+                    <div class="menu-category"></div>
                     <ul class="sidebar-menu">
                         <li class="sidebar-menu-item">
                             <a href="{{ route('home') }}" class="sidebar-menu-link {{ Request::routeIs('home') ? 'active' : '' }}">
@@ -1273,34 +1203,74 @@
                                 <div class="fw-semibold" style="font-size: 14px; color: #333;">
                                     {{ Auth::user()->name }} {{ Auth::user()->lastname }}
                                 </div>
-                                <small class="text-muted" style="font-size: 11px;">
-                                    @php
-                                        $user = Auth::user();
-                                        $contextInfo = \App\Helpers\ContextualAuth::getUserContextInfo($user);
-                                        $rolContextual = '';
+                                @php
+                                    $user = Auth::user();
+                                    $contextInfo = \App\Helpers\ContextualAuth::getUserContextInfo($user);
+                                    $rolesContextuales = [];
 
-                                        if ($user->hasRole('Super Admin')) {
-                                            $rolContextual = 'Super Administrador';
-                                        } elseif ($contextInfo['carreras_director']->isNotEmpty()) {
-                                            $carrera = $contextInfo['carreras_director']->first();
-                                            $rolContextual = 'Director - ' . $carrera->carrera->nombre . ' (' . $carrera->periodo->codigo_periodo . ')';
-                                        } elseif ($contextInfo['carreras_apoyo']->isNotEmpty()) {
-                                            $carrera = $contextInfo['carreras_apoyo']->first();
-                                            $rolContextual = 'Docente de Apoyo - ' . $carrera->carrera->nombre . ' (' . $carrera->periodo->codigo_periodo . ')';
-                                        } elseif ($contextInfo['calificador_general']->isNotEmpty()) {
-                                            $calificador = $contextInfo['calificador_general']->first();
-                                            $rolContextual = 'Calificador General - ' . $calificador->carreraPeriodo->carrera->nombre . ' (' . $calificador->carreraPeriodo->periodo->codigo_periodo . ')';
-                                        } elseif ($contextInfo['tribunales']->isNotEmpty()) {
-                                            $tribunal = $contextInfo['tribunales']->first();
-                                            $rolContextual = ucwords(strtolower($tribunal->status)) . ' - ' . $tribunal->tribunal->carrerasPeriodo->carrera->nombre;
-                                        } elseif ($user->hasRole('Docente')) {
-                                            $rolContextual = 'Docente';
-                                        } else {
-                                            $rolContextual = 'Usuario';
+                                    // Director de Carrera
+                                    foreach ($contextInfo['carreras_director'] as $carrera) {
+                                        $rolesContextuales[] = 'Director - ' . $carrera->carrera->nombre . ' (' . $carrera->periodo->codigo_periodo . ')';
+                                    }
+
+                                    // Docente de Apoyo
+                                    foreach ($contextInfo['carreras_apoyo'] as $carrera) {
+                                        $rolesContextuales[] = 'Docente de Apoyo - ' . $carrera->carrera->nombre . ' (' . $carrera->periodo->codigo_periodo . ')';
+                                    }
+
+                                    // Calificador General
+                                    foreach ($contextInfo['calificador_general'] as $calificador) {
+                                        $rolesContextuales[] = 'Calificador General - ' . $calificador->carreraPeriodo->carrera->nombre . ' (' . $calificador->carreraPeriodo->periodo->codigo_periodo . ')';
+                                    }
+
+                                    // Miembro de Tribunal (agrupar por carrera)
+                                    $tribunalesAgrupados = [];
+                                    foreach ($contextInfo['tribunales'] as $tribunal) {
+                                        if ($tribunal->tribunal && $tribunal->tribunal->carrerasPeriodo) {
+                                            $cp = $tribunal->tribunal->carrerasPeriodo;
+                                            $key = $cp->carrera->nombre;
+                                            if (!isset($tribunalesAgrupados[$key])) {
+                                                $tribunalesAgrupados[$key] = [
+                                                    'carrera' => $cp->carrera->nombre,
+                                                    'periodo' => $cp->periodo->codigo_periodo,
+                                                    'roles' => []
+                                                ];
+                                            }
+                                            $rol = ucwords(strtolower($tribunal->status));
+                                            if (!in_array($rol, $tribunalesAgrupados[$key]['roles'])) {
+                                                $tribunalesAgrupados[$key]['roles'][] = $rol;
+                                            }
                                         }
-                                    @endphp
-                                    {{ $rolContextual }}
-                                </small>
+                                    }
+                                    foreach ($tribunalesAgrupados as $tb) {
+                                        $roles = implode('/', $tb['roles']);
+                                        $rolesContextuales[] = $roles . ' - ' . $tb['carrera'] . ' (' . $tb['periodo'] . ')';
+                                    }
+                                @endphp
+
+                                @if(count($rolesContextuales) > 0)
+                                    {{-- Mostrar roles contextuales específicos --}}
+                                    @foreach($rolesContextuales as $rol)
+                                        <small class="text-muted d-block" style="font-size: 11px; line-height: 1.4;">
+                                            {{ $rol }}
+                                        </small>
+                                    @endforeach
+                                @else
+                                    {{-- Si no tiene roles contextuales, verificar si tiene roles globales --}}
+                                    @if($user->hasRole('Director de Carrera'))
+                                        <small class="text-muted" style="font-size: 11px;">
+                                            Director de Carrera (sin asignaciones activas)
+                                        </small>
+                                    @elseif($user->hasRole('Docente de Apoyo'))
+                                        <small class="text-muted" style="font-size: 11px;">
+                                            Docente de Apoyo (sin asignaciones activas)
+                                        </small>
+                                    @else
+                                        <small class="text-muted" style="font-size: 11px;">
+                                            Sin asignaciones contextuales
+                                        </small>
+                                    @endif
+                                @endif
                             </div>
                             <i class="bi bi-chevron-down text-muted"></i>
                         </a>

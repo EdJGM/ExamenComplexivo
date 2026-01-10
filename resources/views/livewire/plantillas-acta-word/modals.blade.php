@@ -45,9 +45,6 @@
                         </label>
                         <input type="file" class="form-control @error('archivoWord') is-invalid @enderror"
                                wire:model="archivoWord" accept=".doc,.docx" id="archivoWord">
-                        <small class="text-muted ms-1">
-                            <i class="bi bi-file-earmark me-1"></i>Formatos permitidos: .docx, .doc
-                        </small>
                         @error('archivoWord')
                             <div class="text-danger small mt-1">
                                 <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}

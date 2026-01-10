@@ -127,7 +127,7 @@
                                     <option value="">-- Elija Presidente --</option>
                                     @foreach ($profesoresParaTribunal as $profesor)
                                         @if ( (empty($integrante1_id) || $profesor->id != $integrante1_id) && (empty($integrante2_id) || $profesor->id != $integrante2_id) )
-                                            <option value="{{ $profesor->id }}">{{ $profesor->name }}</option>
+                                            <option value="{{ $profesor->id }}">{{ $profesor->name }} {{ $profesor->lastname }}</option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -141,7 +141,7 @@
                                     <option value="">-- Elija Integrante 1 --</option>
                                     @foreach ($profesoresParaTribunal as $profesor)
                                     @if ( (empty($presidente_id) || $profesor->id != $presidente_id) && (empty($integrante2_id) || $profesor->id != $integrante2_id) )
-                                            <option value="{{ $profesor->id }}">{{ $profesor->name }}</option>
+                                            <option value="{{ $profesor->id }}">{{ $profesor->name }} {{ $profesor->lastname }}</option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -155,7 +155,7 @@
                                     <option value="">-- Elija Integrante 2 --</option>
                                     @foreach ($profesoresParaTribunal as $profesor)
                                     @if ( (empty($presidente_id) || $profesor->id != $presidente_id) && (empty($integrante1_id) || $profesor->id != $integrante1_id) )
-                                            <option value="{{ $profesor->id }}">{{ $profesor->name }}</option>
+                                            <option value="{{ $profesor->id }}">{{ $profesor->name }} {{ $profesor->lastname }}</option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -456,25 +456,6 @@
             </div>
             <div class="modal-body">
                 <form wire:submit.prevent="importarTribunales">
-                    {{-- Instrucciones --}}
-                    <div class="alert alert-info mb-4">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-info-circle"></i> Instrucciones para el archivo Excel
-                        </h6>
-                        <ul class="mb-0 small">
-                            <li>El archivo debe tener las siguientes columnas: <strong>TRIBUNAL</strong>, <strong>ESTUDIANTE</strong>, <strong>DESIGNACIÓN</strong>, <strong>DOCENTES</strong>, <strong>HORARIO</strong></li>
-                            <li>Cada tribunal debe tener exactamente <strong>3 filas</strong>: Presidente, Integrante 1, Integrante 2</li>
-                            <li><strong>Soporta celdas combinadas</strong>: Las columnas TRIBUNAL, ESTUDIANTE y HORARIO pueden estar combinadas para las 3 filas</li>
-                            <li>Formato de TRIBUNAL: "Tribunal 1", "Tribunal 2", etc.</li>
-                            <li>Formato de ESTUDIANTE: APELLIDO1 APELLIDO2 NOMBRE1</li>
-                            <li>Formato de DESIGNACIÓN: "Presidente", "Integrante 1", "Integrante 2"</li>
-                            <li>Formato de DOCENTES: Ing. NOMBRE APELLIDO</li>
-                            <li>Formato de HORARIO: HH:MM-HH:MM o HH:MM - HH:MM (ejemplo: 08:00-09:00 o 08:00 - 09:00)</li>
-                            <li>Los encabezados deben estar en la <strong>fila 6</strong> del archivo Excel</li>
-                            <li>Las columnas CASO, LABORATORIO y FIRMA se ignoran (no es necesario eliminarlas)</li>
-                        </ul>
-                    </div>
-
                     {{-- Fecha del Tribunal --}}
                     <div class="mb-3">
                         <label for="fechaImportacion" class="form-label">

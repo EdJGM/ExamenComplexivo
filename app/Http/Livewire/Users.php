@@ -37,6 +37,7 @@ class Users extends Component
             'lastname' => 'required|min:3',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', 'min:6', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
+            'departamento_id' => 'required|exists:departamentos,id',
         ];
     }
 
@@ -55,6 +56,8 @@ class Users extends Component
         'password.mixedCase' => 'La contraseña debe contener al menos una letra mayúscula y una minúscula.',
         'password.numbers' => 'La contraseña debe contener al menos un número.',
         'password.symbols' => 'La contraseña debe contener al menos un símbolo.',
+        'departamento_id.required' => 'El departamento es obligatorio.',
+        'departamento_id.exists' => 'El departamento seleccionado no es válido.',
     ];
 
     public function updated($propertyName)
@@ -204,8 +207,13 @@ class Users extends Component
             $user->lastname = $this->lastname;
             $user->email = $this->email;
             $user->password = Hash::make($this->password);
-            $user->departamento_id = $this->departamento_id; // Opcional: solo para docentes
+            $user->departamento_id = $this->departamento_id;
             $user->save();
+
+            // Asignar el rol 'Docente' si el usuario es nuevo o no tiene roles
+            if (!$user->hasAnyRole()) {
+                $user->assignRole('Docente');
+            }
 
             $this->resetInput();
             $this->dispatchBrowserEvent('closeModalByName', ['modalName' => 'createDataModal']);
@@ -321,10 +329,13 @@ class Users extends Component
         }
 
         $this->validate([
-            'archivoExcelProfesores' => 'required|file|mimes:xlsx,xls'
+            'archivoExcelProfesores' => 'required|file|mimes:xlsx,xls',
+            'departamento_id' => 'required|exists:departamentos,id',
         ], [
             'archivoExcelProfesores.required' => 'Debe seleccionar un archivo.',
             'archivoExcelProfesores.mimes' => 'El archivo debe ser de tipo Excel (xlsx, xls).',
+            'departamento_id.required' => 'Debe seleccionar un departamento.',
+            'departamento_id.exists' => 'El departamento seleccionado no es válido.',
         ]);
 
         $this->importing = true;

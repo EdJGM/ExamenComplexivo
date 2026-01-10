@@ -207,6 +207,17 @@ class Profile extends Component
             'docente_apoyo_id' => $this->docente_apoyo_id,
         ]);
 
+        // Asignar roles globales automáticamente
+        $director = User::find($this->director_id);
+        if ($director && !$director->hasRole('Director de Carrera')) {
+            $director->assignRole('Director de Carrera');
+        }
+
+        $docenteApoyo = User::find($this->docente_apoyo_id);
+        if ($docenteApoyo && !$docenteApoyo->hasRole('Docente de Apoyo')) {
+            $docenteApoyo->assignRole('Docente de Apoyo');
+        }
+
         $this->resetInput();
         $this->refreshCarrerasPeriodos();
         $this->dispatchBrowserEvent('closeModalByName', ['modalName' => 'createDataModal']);
@@ -262,6 +273,17 @@ class Profile extends Component
                 'director_id' => $this->director_id,
                 'docente_apoyo_id' => $this->docente_apoyo_id,
             ]);
+
+            // Asignar roles globales automáticamente
+            $director = User::find($this->director_id);
+            if ($director && !$director->hasRole('Director de Carrera')) {
+                $director->assignRole('Director de Carrera');
+            }
+
+            $docenteApoyo = User::find($this->docente_apoyo_id);
+            if ($docenteApoyo && !$docenteApoyo->hasRole('Docente de Apoyo')) {
+                $docenteApoyo->assignRole('Docente de Apoyo');
+            }
 
             $this->resetInput();
             $this->refreshCarrerasPeriodos();

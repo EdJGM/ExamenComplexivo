@@ -677,7 +677,7 @@
                 {{-- Firma del Director de Carrera --}}
                 <div class="director-signature">
                     <div class="director-line">
-                        {{ $tribunal->carrerasPeriodo->director->name ?? 'Director de Carrera' }}<br>
+                        {{ ($tribunal->carrerasPeriodo->director->name ?? '') . ' ' . ($tribunal->carrerasPeriodo->director->lastname ?? 'Director de Carrera') }}<br>
                         CI. {{ str_pad($tribunal->carrerasPeriodo->director->cedula ?? '1710802925', 10, '0', STR_PAD_LEFT) }}<br>
                         <strong>Director de Carrera</strong>
                     </div>

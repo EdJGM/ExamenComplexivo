@@ -103,24 +103,22 @@
                     <!-- Departamento -->
                     <div class="mb-3">
                         <label for="departamento_id_create" class="form-label fw-semibold">
-                            <i class="bi bi-building text-info me-1"></i>Departamento (Opcional)
+                            <i class="bi bi-building text-info me-1"></i>Departamento
+                            <span class="text-danger">*</span>
                         </label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-building-check text-muted"></i>
                             </span>
-                            <select wire:model="departamento_id" 
-                                    class="form-select border-start-0 @error('departamento_id') is-invalid @enderror" 
+                            <select wire:model="departamento_id"
+                                    class="form-select border-start-0 @error('departamento_id') is-invalid @enderror"
                                     id="departamento_id_create">
-                                <option value="">Sin departamento asignado</option>
+                                <option value="">Seleccione un departamento</option>
                                 @foreach($departamentosDisponibles as $depto)
                                     <option value="{{ $depto->id }}">{{ $depto->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <small class="text-muted ms-1">
-                            <i class="bi bi-info-circle me-1"></i>Asignar departamento solo para docentes
-                        </small>
                         @error('departamento_id')
                             <div class="text-danger small mt-1">
                                 <i class="bi bi-exclamation-circle me-1"></i>{{ $message }}
@@ -370,16 +368,17 @@
                     <!-- Departamento -->
                     <div class="mb-3">
                         <label for="departamento_id_import" class="form-label fw-semibold">
-                            <i class="bi bi-building text-info me-1"></i>Departamento (Opcional)
+                            <i class="bi bi-building text-info me-1"></i>Departamento
+                            <span class="text-danger">*</span>
                         </label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-building-check text-muted"></i>
                             </span>
-                            <select wire:model="departamento_id" 
-                                    class="form-select border-start-0 @error('departamento_id') is-invalid @enderror" 
+                            <select wire:model="departamento_id"
+                                    class="form-select border-start-0 @error('departamento_id') is-invalid @enderror"
                                     id="departamento_id_import">
-                                <option value="">Sin departamento asignado</option>
+                                <option value="">Seleccione un departamento</option>
                                 @foreach($departamentosDisponibles as $depto)
                                     <option value="{{ $depto->id }}">{{ $depto->nombre }}</option>
                                 @endforeach

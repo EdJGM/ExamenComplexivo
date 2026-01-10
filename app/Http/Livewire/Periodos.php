@@ -185,6 +185,13 @@ class Periodos extends Component
         }
 
         $record = Periodo::findOrFail($id);
+
+        // Verificar si el periodo tiene carreras asociadas
+        if ($record->carrerasPeriodos()->exists()) {
+            session()->flash('warning', 'No se puede editar el periodo porque tiene carreras asociadas.');
+            return;
+        }
+
         $this->selected_id = $id;
         $this->codigo_periodo = $record->codigo_periodo;
         $this->descripcion = $record->descripcion;
@@ -197,6 +204,18 @@ class Periodos extends Component
         if (!$this->puedeGestionarPeriodos()) {
             session()->flash('error', 'No tienes permisos para actualizar períodos.');
             return;
+        }
+
+        if ($this->selected_id) {
+            $record = Periodo::find($this->selected_id);
+
+            // Verificar si el periodo tiene carreras asociadas
+            if ($record && $record->carrerasPeriodos()->exists()) {
+                session()->flash('warning', 'No se puede actualizar el periodo porque tiene carreras asociadas.');
+                $this->resetInput();
+                $this->dispatchBrowserEvent('closeModalByName', ['modalName' => 'updateDataModal']);
+                return;
+            }
         }
 
         $this->validate([
