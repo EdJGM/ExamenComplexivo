@@ -285,6 +285,33 @@
                                     <strong>PDF (desde Word):</strong> Convierte plantilla Word a PDF.
                                 </small>
                             </div> -->
+
+                            {{-- Sección de acta firmada --}}
+                            @if($tribunal->acta_firmada_path)
+                                <hr class="my-4">
+                                <div class="alert alert-success d-flex align-items-start" role="alert">
+                                    <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                                    <div class="flex-grow-1">
+                                        <strong>Acta Firmada Disponible</strong><br>
+                                        <small class="text-muted">
+                                            Subida el {{ \Carbon\Carbon::parse($tribunal->acta_firmada_fecha)->format('d/m/Y H:i') }}
+                                            por {{ $tribunal->usuarioSubioActa->name ?? 'Usuario desconocido' }}
+                                        </small>
+                                    </div>
+                                </div>
+                                @can('descargar-acta-firmada-de-este-tribunal', $tribunal)
+                                    <button class="btn text-white px-4 py-2" wire:click="descargarActaFirmada" wire:loading.attr="disabled"
+                                            style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); border: none; transition: all 0.3s ease; font-weight: 600;"
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(40,167,69,0.4)'"
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+                                            title="Descargar Acta Firmada">
+                                        <span wire:loading wire:target="descargarActaFirmada" class="spinner-border spinner-border-sm me-2"
+                                            role="status" aria-hidden="true"></span>
+                                        <i class="bi bi-download me-2" wire:loading.remove wire:target="descargarActaFirmada"></i>
+                                        Descargar Acta Firmada
+                                    </button>
+                                @endcan
+                            @endif
                         </div>
                     </div>
                 @elseif($tribunal && $tribunal->estado !== 'CERRADO')

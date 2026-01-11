@@ -1103,6 +1103,26 @@
                             </li>
                         @endif
 
+                        {{-- Mis Actas Firmadas: Para presidentes de tribunales --}}
+                        @if (!$isSuperAdminOrAdmin && $esMiembroTribunal && Auth::user()->can('subir acta firmada mi tribunal (presidente)'))
+                            <li class="sidebar-menu-item">
+                                <a href="{{ route('actas-firmadas.index') }}" class="sidebar-menu-link {{ Request::is('actas-firmadas') ? 'active' : '' }}">
+                                    <i class="bi bi-file-earmark-arrow-up"></i>
+                                    <span>Mis Actas Firmadas</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Actas Firmadas: Para Director/Apoyo --}}
+                        @if (!$isSuperAdminOrAdmin && ($esDirectorCarrera || $esDocenteApoyo) && Auth::user()->can('descargar actas firmadas'))
+                            <li class="sidebar-menu-item">
+                                <a href="{{ route('actas-firmadas-descarga.index') }}" class="sidebar-menu-link {{ Request::is('actas-firmadas-descarga') ? 'active' : '' }}">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    <span>Actas Firmadas</span>
+                                </a>
+                            </li>
+                        @endif
+
                         {{-- Docentes: Director/Apoyo pueden gestionar docentes --}}
                         @if (!$isSuperAdminOrAdmin && ($esDirectorCarrera || $esDocenteApoyo))
                             <li class="sidebar-menu-item">

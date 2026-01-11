@@ -288,5 +288,25 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('gestionar-plantillas-sistema', function (User $user) {
             return $user->hasPermissionTo('gestionar plantillas rubricas');
         });
+
+        // === GATES PARA ACTAS FIRMADAS ===
+        // Gate para que el Presidente suba acta firmada de SU tribunal
+        Gate::define('subir-acta-firmada-este-tribunal-como-presidente', function (User $user, Tribunale $tribunal) {
+            if ($user->hasPermissionTo('subir acta firmada mi tribunal (presidente)')) {
+                return ContextualAuth::isPresidentOfTribunal($user, $tribunal->id) && $tribunal->estado === 'CERRADO';
+            }
+            return false;
+        });
+
+        // Gate para que Director/Apoyo descarguen actas firmadas de tribunales de su carrera-periodo
+        Gate::define('descargar-acta-firmada-de-este-tribunal', function (User $user, Tribunale $tribunal) {
+            if ($user->hasPermissionTo('descargar actas firmadas')) {
+                $carreraPeriodo = $tribunal->carrerasPeriodo;
+                if ($carreraPeriodo) {
+                    return ContextualAuth::canAccessCarreraPeriodo($user, $carreraPeriodo->id);
+                }
+            }
+            return false;
+        });
     }
 }

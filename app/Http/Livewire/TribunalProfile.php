@@ -1322,6 +1322,46 @@ class TribunalProfile extends Component
         }
     }
 
+    public function descargarActaFirmada()
+    {
+        if (!$this->tribunal || !$this->tribunal->acta_firmada_path) {
+            session()->flash('danger', 'No hay acta firmada disponible para descargar.');
+            $this->dispatchBrowserEvent('showFlashMessage');
+            return;
+        }
+
+        // Verificar permisos usando Gate
+        if (!Gate::allows('descargar-acta-firmada-de-este-tribunal', $this->tribunal)) {
+            session()->flash('danger', 'No tienes permisos para descargar esta acta firmada.');
+            $this->dispatchBrowserEvent('showFlashMessage');
+            return;
+        }
+
+        try {
+            if (!Storage::disk('private')->exists($this->tribunal->acta_firmada_path)) {
+                session()->flash('danger', 'El archivo del acta firmada no existe en el servidor.');
+                $this->dispatchBrowserEvent('showFlashMessage');
+                return;
+            }
+
+            $nombreEstudiante = $this->tribunal->estudiante
+                ? str_replace(' ', '_', $this->tribunal->estudiante->apellidos . '_' . $this->tribunal->estudiante->nombres)
+                : 'tribunal_' . $this->tribunal->id;
+
+            $nombreArchivo = 'Acta_Firmada_' . $nombreEstudiante . '_' . date('Y-m-d') . '.pdf';
+
+            return Storage::disk('private')->download($this->tribunal->acta_firmada_path, $nombreArchivo);
+
+        } catch (\Exception $e) {
+            session()->flash('danger', 'Error al descargar el acta firmada: ' . $e->getMessage());
+            $this->dispatchBrowserEvent('showFlashMessage');
+            Log::error('Error al descargar acta firmada: ' . $e->getMessage(), [
+                'tribunal_id' => $this->tribunal->id ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
     private function numeroALetrasConPunto($numero): string
     {
         $numeros = [

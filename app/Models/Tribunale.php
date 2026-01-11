@@ -23,7 +23,10 @@ class Tribunale extends Model
         'es_plantilla',
         'descripcion_plantilla',
         'laboratorio',
-        'nombre_tribunal'
+        'nombre_tribunal',
+        'acta_firmada_path',
+        'acta_firmada_subida_por',
+        'acta_firmada_fecha'
     ];
 
     /**
@@ -62,5 +65,13 @@ class Tribunale extends Model
     public function logs()
     {
         return $this->hasMany(TribunalLog::class, 'tribunal_id')->latest(); // Mostrar los más recientes primero
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function usuarioSubioActa()
+    {
+        return $this->belongsTo('App\Models\User', 'acta_firmada_subida_por');
     }
 }

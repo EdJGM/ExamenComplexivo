@@ -85,7 +85,9 @@ class RoleSeeder extends Seeder
             // === PERMISOS DE PRESIDENTE DE TRIBUNAL ===
             'editar datos basicos mi tribunal (presidente)', // Editar fecha, hora, miembros (antes de calificar)
             'exportar acta mi tribunal (presidente)',      // Generar/exportar el acta del tribunal que preside
+            'subir acta firmada mi tribunal (presidente)', // Subir acta firmada del tribunal que preside
             'gestionar actas tribunales',                  // Administrar actas de tribunales
+            'descargar actas firmadas',                    // Descargar actas firmadas (director/apoyo)
 
             // === PERMISOS DE REPORTES Y ESTADÍSTICAS ===
             'ver resumenes y reportes academicos',  // Generar/ver reportes
@@ -144,6 +146,8 @@ class RoleSeeder extends Seeder
             'calificar en tribunal',
             'editar datos basicos mi tribunal (presidente)',
             'exportar acta mi tribunal (presidente)',
+            'subir acta firmada mi tribunal (presidente)',
+            'descargar actas firmadas',
         ]);
 
         // === DOCENTE DE APOYO ===
@@ -176,6 +180,8 @@ class RoleSeeder extends Seeder
             'calificar en tribunal',
             'editar datos basicos mi tribunal (presidente)',
             'exportar acta mi tribunal (presidente)',
+            'subir acta firmada mi tribunal (presidente)',
+            'descargar actas firmadas',
         ]);
 
         // === DOCENTE ===
@@ -188,6 +194,7 @@ class RoleSeeder extends Seeder
             // Solo si es presidente del tribunal
             'editar datos basicos mi tribunal (presidente)',
             'exportar acta mi tribunal (presidente)',
+            'subir acta firmada mi tribunal (presidente)',
         ]);
     }
 }

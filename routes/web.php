@@ -106,6 +106,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/calificar/{tribunalId}', [TribunalesController::class,'calificar'])->name('calificar');
     });
 
+    // === ACTAS FIRMADAS ===
+    // Para presidentes de tribunales - subir actas firmadas
+    Route::middleware(['permission:subir acta firmada mi tribunal (presidente)'])->group(function () {
+        Route::view('/actas-firmadas', 'livewire.actas-firmadas.index')->name('actas-firmadas.index');
+    });
+
+    // Para directores y docentes de apoyo - descargar actas firmadas
+    Route::middleware(['permission:descargar actas firmadas'])->group(function () {
+        Route::view('/actas-firmadas-descarga', 'livewire.actas-firmadas-descarga.index')->name('actas-firmadas-descarga.index');
+    });
+
     // === PLANES DE EVALUACIÓN (Contextual según carrera-período) ===
     Route::prefix('planes-evaluacion')->name('planes_evaluacion.')->group(function () {
         // Verificación contextual en el controlador usando Gates
