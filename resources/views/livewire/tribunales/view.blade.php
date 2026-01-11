@@ -294,6 +294,12 @@
                     <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                         <tr>
                             <th style="width: 100px;">Tribunal</th>
+                            <th wire:click="sortBy('caso')" class="sortable-header" style="width: 80px;">
+                                <i class="bi bi-file-text me-1"></i>Caso
+                                <span class="sort-icon">
+                                    <i class="bi {{ $this->getSortIcon('caso') }}"></i>
+                                </span>
+                            </th>
                             <th wire:click="sortBy('estudiante')" class="sortable-header">
                                 <i class="bi bi-person me-1"></i>Estudiante
                                 <span class="sort-icon">
@@ -326,6 +332,13 @@
                                         <span class="badge bg-primary">{{ $row->nombre_tribunal }}</span>
                                     @else
                                         <span class="badge bg-primary">Tribunal {{ $loop->iteration }}</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($row->caso)
+                                        <span class="badge bg-info">{{ $row->caso }}</span>
+                                    @else
+                                        <small class="text-muted">-</small>
                                     @endif
                                 </td>
                                 <td>
@@ -420,7 +433,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-5">
+                                <td colspan="9" class="text-center py-5">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
                                     <p class="text-muted mb-0">No se encontraron tribunales</p>
                                 </td>

@@ -49,6 +49,7 @@ class Tribunales extends Component
     public $hora_inicio;
     public $hora_fin;
     public $laboratorio;
+    public $caso;
     public $presidente_id;
     public $integrante1_id;
     public $integrante2_id;
@@ -445,6 +446,7 @@ class Tribunales extends Component
     private function resetInput()
     {
         $this->estudiante_id = null;
+        $this->caso = null;
         $this->fecha = now()->format('Y-m-d'); // Default a hoy
         $this->hora_inicio = null;
         $this->hora_fin = null;
@@ -691,6 +693,7 @@ class Tribunales extends Component
                         'hora_inicio' => $validatedData['hora_inicio'],
                         'hora_fin' => $validatedData['hora_fin'],
                         'laboratorio' => $validatedData['laboratorio'],
+                        'caso' => !empty($this->caso) ? $this->caso : null,
                         'estado' => 'ABIERTO',
                         'es_plantilla' => false,
                         'descripcion_plantilla' => null

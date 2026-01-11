@@ -24,6 +24,7 @@ class Tribunale extends Model
         'descripcion_plantilla',
         'laboratorio',
         'nombre_tribunal',
+        'caso',
         'acta_firmada_path',
         'acta_firmada_subida_por',
         'acta_firmada_fecha'

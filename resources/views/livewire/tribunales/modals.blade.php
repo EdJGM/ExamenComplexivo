@@ -66,6 +66,17 @@
                             </select>
                             @error('estudiante_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+
+                        {{-- Caso --}}
+                        <div class="mb-3">
+                            <label for="caso_create" class="form-label">Caso</label>
+                            <input wire:model.defer="caso" type="text" class="form-control @error('caso') is-invalid @enderror"
+                                   id="caso_create" placeholder="Ej: 6">
+                            @error('caso') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Número o identificador del caso (opcional).
+                            </small>
+                        </div>
                     @endif
 
                     <div class="row">
@@ -166,10 +177,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                            wire:click="$set('showModal', false)">
-                        <span class="fas fa-times"></span> Cancelar
-                    </button>
+                <button type="button" class="btn btn-secondary" wire:click="cancel()" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </button>
                 <button type="button" wire:click.prevent="store()" class="btn btn-primary">
                     @if($modoPlantilla)
                         <i class="bi bi-diagram-2"></i> Crear Plantilla

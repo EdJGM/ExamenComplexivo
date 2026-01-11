@@ -249,8 +249,12 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
         // Procesar miembros del tribunal
         $miembros = $this->procesarMiembros($filas);
 
+        // Obtener el caso desde la primera fila (ya viene propagado)
+        $caso = $primeraFila['caso'] ?? null;
+        $caso = !empty(trim($caso)) ? trim($caso) : null;
+
         // Crear tribunal en una transacción
-        DB::transaction(function () use ($estudiante, $horarioData, $miembros, $nombreTribunal, $laboratorio) {
+        DB::transaction(function () use ($estudiante, $horarioData, $miembros, $nombreTribunal, $laboratorio, $caso) {
             // Crear tribunal
             $tribunal = Tribunale::create([
                 'carrera_periodo_id' => $this->carrera_periodo_id,
@@ -260,6 +264,7 @@ class TribunalesFirstSheetImport implements ToCollection, WithHeadingRow, SkipsE
                 'hora_fin' => $horarioData['hora_fin'],
                 'laboratorio' => !empty($laboratorio) ? $laboratorio : null,
                 'nombre_tribunal' => !empty($nombreTribunal) ? $nombreTribunal : null,
+                'caso' => $caso,
                 'estado' => 'ABIERTO',
                 'es_plantilla' => false,
                 'descripcion_plantilla' => null,
