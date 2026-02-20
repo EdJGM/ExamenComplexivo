@@ -14,6 +14,7 @@ class MiembroCalificacion extends Model
         'user_id',
         'tribunal_id',
         'item_plan_evaluacion_id',
+        'componente_rubrica_id',
         'criterio_id',
         'calificacion_criterio_id',
         'nota_obtenida_directa',
@@ -33,6 +34,11 @@ class MiembroCalificacion extends Model
     public function itemPlanEvaluacion()
     {
         return $this->belongsTo(ItemPlanEvaluacion::class, 'item_plan_evaluacion_id');
+    }
+
+    public function componenteRubrica()
+    {
+        return $this->belongsTo(ComponenteRubrica::class, 'componente_rubrica_id');
     }
     public function criterioCalificado() // El criterio que se calificó
     {

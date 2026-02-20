@@ -368,7 +368,7 @@
 
                             </td>
                             <td>{{ number_format($item['nota_tribunal_sobre_20'] ?? 0, 2) }}</td>
-                            <td>{{ isset($item['ponderacion_global']) * 2 ? number_format($item['ponderacion_global'] * 2, 0) : '0' }}%
+                            <td>{{ isset($item['ponderacion_global']) * 2 ? number_format($item['ponderacion_global'], 0) : '0' }}%
                             </td>
                             <td>
                                 {{ number_format($item['puntaje_ponderado_item'] ?? 0, 2) }}

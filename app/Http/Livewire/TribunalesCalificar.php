@@ -47,6 +47,12 @@ class TribunalesCalificar extends Component
     public $itemsACalificarPorUsuario = [];       // [itemPlanId => true/false]
     public $componentesACalificarPorUsuario = []; // [itemPlanId => [componenteRId => true/false]]
 
+    // Almacena qué componentes tienen asignación DIRECTOR_NOTA_CALIFICADORES
+    public $componentesNotaDirectaCalificadores = []; // [itemPlanId => [componenteRId => true/false]]
+
+    // Notas directas para componentes con asignación DIRECTOR_NOTA_CALIFICADORES
+    public $notasDirectasComponentes = []; // [itemPlanId => [componenteRId => ['nota' => X, 'observacion' => Y]]]
+
     public $esCalificadorGeneral = false;
 
     protected function rules()
@@ -72,10 +78,23 @@ class TribunalesCalificar extends Component
                 // La lógica de quién califica ya está en $this->itemsACalificarPorUsuario[$itemPlanId]
                 $rules["calificaciones.{$itemPlanId}.nota_directa"] = 'required|numeric|min:0|max:20';
             } elseif ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && $itemPlan->rubricaPlantilla) {
+                // Validar notas directas para componentes con DIRECTOR_NOTA_CALIFICADORES
+                if (isset($this->notasDirectasComponentes[$itemPlanId])) {
+                    foreach ($this->notasDirectasComponentes[$itemPlanId] as $componenteRId => $datosNota) {
+                        if ($this->componentesNotaDirectaCalificadores[$itemPlanId][$componenteRId] ?? false) {
+                            $rules["notasDirectasComponentes.{$itemPlanId}.{$componenteRId}.nota"] = 'required|numeric|min:0|max:20';
+                            $rules["notasDirectasComponentes.{$itemPlanId}.{$componenteRId}.observacion"] = 'nullable|string|max:500';
+                        }
+                    }
+                }
                 if (isset($datosItem['componentes_evaluados'])) {
                     foreach ($datosItem['componentes_evaluados'] as $componenteRId => $datosComponente) {
                         // Solo añadir reglas para los componentes que este usuario debe calificar
                         if (!($this->componentesACalificarPorUsuario[$itemPlanId][$componenteRId] ?? false)) {
+                            continue;
+                        }
+                        // Saltar componentes con nota directa (no tienen criterios)
+                        if ($this->componentesNotaDirectaCalificadores[$itemPlanId][$componenteRId] ?? false) {
                             continue;
                         }
                         if (isset($datosComponente['criterios_evaluados'])) {
@@ -107,7 +126,19 @@ class TribunalesCalificar extends Component
 
             if ($itemPlan->tipo_item === 'NOTA_DIRECTA') {
                 $attributes["calificaciones.{$itemPlanId}.nota_directa"] = "nota para '{$itemPlan->nombre_item}'";
-            } elseif ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && $itemPlan->rubricaPlantilla && isset($datosItem['componentes_evaluados'])) {
+            } elseif ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && $itemPlan->rubricaPlantilla) {
+                // Atributos para notas directas de componentes con DIRECTOR_NOTA_CALIFICADORES
+                if (isset($this->notasDirectasComponentes[$itemPlanId])) {
+                    foreach ($this->notasDirectasComponentes[$itemPlanId] as $componenteRId => $datosNota) {
+                        $componenteRubricaObj = $itemPlan->rubricaPlantilla->componentesRubrica->find($componenteRId);
+                        if ($componenteRubricaObj) {
+                            $attributes["notasDirectasComponentes.{$itemPlanId}.{$componenteRId}.nota"] = "nota para '{$componenteRubricaObj->nombre}'";
+                            $attributes["notasDirectasComponentes.{$itemPlanId}.{$componenteRId}.observacion"] = "observación para '{$componenteRubricaObj->nombre}'";
+                        }
+                    }
+                }
+            }
+            if ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && $itemPlan->rubricaPlantilla && isset($datosItem['componentes_evaluados'])) {
                 foreach ($datosItem['componentes_evaluados'] as $componenteRId => $datosComponente) {
                     if (!($this->componentesACalificarPorUsuario[$itemPlanId][$componenteRId] ?? false)) continue;
 
@@ -216,6 +247,8 @@ class TribunalesCalificar extends Component
     {
         $this->itemsACalificarPorUsuario = [];
         $this->componentesACalificarPorUsuario = [];
+        $this->componentesNotaDirectaCalificadores = [];
+        $this->notasDirectasComponentes = [];
         $this->tieneAlgoQueCalificar = false; // Resetear
 
         if (!$this->planEvaluacionActivo || !$this->usuarioActual || !$this->tribunal->carrerasPeriodo) return;
@@ -254,12 +287,15 @@ class TribunalesCalificar extends Component
                 }
             } elseif ($itemPlan->tipo_item === 'RUBRICA_TABULAR') {
                 $this->componentesACalificarPorUsuario[$itemPlan->id] = [];
+                $this->componentesNotaDirectaCalificadores[$itemPlan->id] = [];
                 if ($itemPlan->rubricaPlantilla) {
                     foreach ($itemPlan->rubricaPlantilla->componentesRubrica as $componenteR) {
                         $asignacion = $itemPlan->asignacionesCalificadorComponentes
                             ->firstWhere('componente_rubrica_id', $componenteR->id);
 
                         $puedeCalificarEsteComponenteIndividual = false;
+                        $esNotaDirectaCalificadores = false;
+
                         if ($asignacion) {
                             if ($asignacion->calificado_por === 'MIEMBROS_TRIBUNAL' && $this->usuarioEsMiembroFisicoDelTribunal) {
                                 $puedeCalificarEsteComponenteIndividual = true;
@@ -275,10 +311,21 @@ class TribunalesCalificar extends Component
                                 ($esDirectorActual || $esApoyoActual)) {
                                 $puedeCalificarEsteComponenteIndividual = true;
                             }
+                            // NUEVA OPCIÓN: Director (Nota Calificadores) - Director/Apoyo ingresan nota directa
+                            if ($asignacion->calificado_por === 'DIRECTOR_NOTA_CALIFICADORES' && ($esDirectorActual || $esApoyoActual)) {
+                                $puedeCalificarEsteComponenteIndividual = true;
+                                $esNotaDirectaCalificadores = true;
+                                // Inicializar el array para nota directa de este componente
+                                $this->notasDirectasComponentes[$itemPlan->id][$componenteR->id] = [
+                                    'nota' => null,
+                                    'observacion' => '',
+                                ];
+                            }
                         } else if ($esCalificadorGeneral) {
                             Log::info('DEBUG CALIFICADOR GENERAL - ✗ NO encontrada asignación para componente: ' . $componenteR->id . ' del item: ' . $itemPlan->id);
                         }
                         $this->componentesACalificarPorUsuario[$itemPlan->id][$componenteR->id] = $puedeCalificarEsteComponenteIndividual;
+                        $this->componentesNotaDirectaCalificadores[$itemPlan->id][$componenteR->id] = $esNotaDirectaCalificadores;
                         if ($puedeCalificarEsteComponenteIndividual) {
                             $puedeCalificarEsteItemGlobal = true; // Si puede calificar al menos un componente de la rúbrica
                         }
@@ -347,6 +394,7 @@ class TribunalesCalificar extends Component
             $califGeneralItemGuardada = $calificacionesGuardadas
                 ->where('item_plan_evaluacion_id', $itemPlanId)
                 ->whereNull('criterio_id')
+                ->whereNull('componente_rubrica_id')
                 ->first();
 
             $datosItemActual['observacion_general_item'] = $califGeneralItemGuardada?->observacion ?? $datosItemActual['observacion_general_item'];
@@ -354,9 +402,28 @@ class TribunalesCalificar extends Component
             if ($datosItemActual['tipo'] === 'NOTA_DIRECTA') {
                 $datosItemActual['nota_directa'] = $califGeneralItemGuardada?->nota_obtenida_directa ?? $datosItemActual['nota_directa'];
             } elseif ($datosItemActual['tipo'] === 'RUBRICA_TABULAR') {
+                // Cargar notas directas de componentes con DIRECTOR_NOTA_CALIFICADORES
+                if (isset($this->notasDirectasComponentes[$itemPlanId])) {
+                    foreach ($this->notasDirectasComponentes[$itemPlanId] as $componenteRId => &$datosNotaDirecta) {
+                        $califComponenteGuardada = $calificacionesGuardadas
+                            ->where('item_plan_evaluacion_id', $itemPlanId)
+                            ->where('componente_rubrica_id', $componenteRId)
+                            ->whereNull('criterio_id')
+                            ->first();
+
+                        if ($califComponenteGuardada) {
+                            $datosNotaDirecta['nota'] = $califComponenteGuardada->nota_obtenida_directa;
+                            $datosNotaDirecta['observacion'] = $califComponenteGuardada->observacion ?? '';
+                        }
+                    }
+                }
+
+                // Cargar calificaciones de criterios normales (rúbrica)
                 if (isset($datosItemActual['componentes_evaluados'])) {
                     foreach ($datosItemActual['componentes_evaluados'] as $componenteRId => &$datosComponenteActual) {
                         if (!($this->componentesACalificarPorUsuario[$itemPlanId][$componenteRId] ?? false)) continue;
+                        // Saltar componentes con nota directa (no tienen criterios)
+                        if ($this->componentesNotaDirectaCalificadores[$itemPlanId][$componenteRId] ?? false) continue;
 
                         if (isset($datosComponenteActual['criterios_evaluados'])) {
                             foreach ($datosComponenteActual['criterios_evaluados'] as $criterioRId => &$datosCriterioActual) {
@@ -397,18 +464,22 @@ class TribunalesCalificar extends Component
         }
 
         DB::transaction(function () use ($validatedData) {
-            foreach ($validatedData['calificaciones'] as $itemPlanId => $datosItemValidados) {
-                if (!($this->itemsACalificarPorUsuario[$itemPlanId] ?? false)) continue;
+            // Iterar sobre todos los ítems que el usuario puede calificar
+            foreach ($this->itemsACalificarPorUsuario as $itemPlanId => $puedeCalificar) {
+                if (!$puedeCalificar) continue;
 
                 $itemPlan = $this->planEvaluacionActivo->itemsPlanEvaluacion->find($itemPlanId);
                 if (!$itemPlan) continue;
 
+                $datosItemValidados = $validatedData['calificaciones'][$itemPlanId] ?? [];
+
                 // Guardar/Actualizar la observación general del ítem y/o nota directa
                 $calificacionGeneralData = [
                     'observacion' => $datosItemValidados['observacion_general_item'] ?? null,
+                    'componente_rubrica_id' => null,
                 ];
                 if ($itemPlan->tipo_item === 'NOTA_DIRECTA') {
-                    $calificacionGeneralData['nota_obtenida_directa'] = $datosItemValidados['nota_directa'];
+                    $calificacionGeneralData['nota_obtenida_directa'] = $datosItemValidados['nota_directa'] ?? null;
                 }
 
                 MiembroCalificacion::updateOrCreate(
@@ -416,15 +487,18 @@ class TribunalesCalificar extends Component
                         'tribunal_id' => $this->tribunal->id,
                         'user_id' => $this->usuarioActual->id,
                         'item_plan_evaluacion_id' => $itemPlanId,
+                        'componente_rubrica_id' => null,
                         'criterio_id' => null // Para la calificación/observación general del ítem
                     ],
                     $calificacionGeneralData
                 );
 
                 // Guardar/Actualizar calificaciones de los criterios para rúbricas
-                if ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && isset($datosItemValidados['componentes_evaluados'])) {
+                if ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && !empty($datosItemValidados['componentes_evaluados'])) {
                     foreach ($datosItemValidados['componentes_evaluados'] as $componenteRId => $datosComponente) {
                         if (!($this->componentesACalificarPorUsuario[$itemPlanId][$componenteRId] ?? false)) continue;
+                        // Saltar componentes con nota directa (se guardan aparte)
+                        if ($this->componentesNotaDirectaCalificadores[$itemPlanId][$componenteRId] ?? false) continue;
 
                         if (isset($datosComponente['criterios_evaluados'])) {
                             foreach ($datosComponente['criterios_evaluados'] as $criterioRId => $datosCriterio) {
@@ -433,15 +507,46 @@ class TribunalesCalificar extends Component
                                         'tribunal_id' => $this->tribunal->id,
                                         'user_id' => $this->usuarioActual->id,
                                         'item_plan_evaluacion_id' => $itemPlanId,
+                                        'componente_rubrica_id' => null,
                                         'criterio_id' => $criterioRId,
                                     ],
                                     [
                                         'calificacion_criterio_id' => $datosCriterio['calificacion_criterio_id'],
                                         'observacion' => $datosCriterio['observacion_criterio'] ?? null,
-                                        'nota_obtenida_directa' => null, // Asegurar null para calificaciones de criterio
+                                        'nota_obtenida_directa' => null,
                                     ]
                                 );
                             }
+                        }
+                    }
+                }
+
+                // Guardar/Actualizar notas directas de componentes con DIRECTOR_NOTA_CALIFICADORES
+                if ($itemPlan->tipo_item === 'RUBRICA_TABULAR' && isset($this->notasDirectasComponentes[$itemPlanId])) {
+                    foreach ($this->notasDirectasComponentes[$itemPlanId] as $componenteRId => $datosNotaDirecta) {
+                        if (!($this->componentesNotaDirectaCalificadores[$itemPlanId][$componenteRId] ?? false)) continue;
+
+                        // Usar datos validados si están disponibles, sino usar los del array directo
+                        $notaValidada = $validatedData['notasDirectasComponentes'][$itemPlanId][$componenteRId]['nota']
+                            ?? $datosNotaDirecta['nota'];
+                        $observacionValidada = $validatedData['notasDirectasComponentes'][$itemPlanId][$componenteRId]['observacion']
+                            ?? $datosNotaDirecta['observacion'] ?? null;
+
+                        if ($notaValidada !== null) {
+                            MiembroCalificacion::updateOrCreate(
+                                [
+                                    'tribunal_id' => $this->tribunal->id,
+                                    'user_id' => $this->usuarioActual->id,
+                                    'item_plan_evaluacion_id' => $itemPlanId,
+                                    'componente_rubrica_id' => $componenteRId,
+                                    'criterio_id' => null,
+                                ],
+                                [
+                                    'nota_obtenida_directa' => $notaValidada,
+                                    'observacion' => $observacionValidada,
+                                    'calificacion_criterio_id' => null,
+                                ]
+                            );
                         }
                     }
                 }

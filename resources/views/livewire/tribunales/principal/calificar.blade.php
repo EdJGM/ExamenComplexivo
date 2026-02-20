@@ -388,6 +388,10 @@
                                                         $componentesACalificarPorUsuario[$itemPlanId][
                                                             $componenteR->id
                                                         ] ?? false;
+                                                    $esNotaDirectaCalificadores =
+                                                        $componentesNotaDirectaCalificadores[$itemPlanId][
+                                                            $componenteR->id
+                                                        ] ?? false;
                                                 @endphp
 
                                                 @if ($puedeCalificarEsteComponente)
@@ -397,7 +401,46 @@
                                                         <h6 class="fw-bold mb-3" style="color: #2d7a5f;">
                                                             <i class="bi bi-grid-3x3 me-2"></i>{{ $componenteR->nombre }}
                                                             <small class="text-muted fw-normal">({{ $componenteR->ponderacion }}% de esta rúbrica)</small>
+                                                            @if ($esNotaDirectaCalificadores)
+                                                                <span class="badge bg-warning text-dark ms-2">Nota Directa</span>
+                                                            @endif
                                                         </h6>
+
+                                                        @if ($esNotaDirectaCalificadores)
+                                                            {{-- Mostrar input de nota directa en lugar de la rúbrica --}}
+                                                            <div class="row">
+                                                                <div class="col-md-4 mb-3">
+                                                                    <label for="nota_directa_comp_{{ $itemPlanId }}_{{ $componenteR->id }}" class="form-label fw-semibold">
+                                                                        <i class="bi bi-123 me-1"></i>Nota Calificadores (0-20)
+                                                                    </label>
+                                                                    <input type="number" step="0.01" min="0" max="20"
+                                                                        class="form-control @error('notasDirectasComponentes.' . $itemPlanId . '.' . $componenteR->id . '.nota') is-invalid @enderror"
+                                                                        id="nota_directa_comp_{{ $itemPlanId }}_{{ $componenteR->id }}"
+                                                                        wire:model.defer="notasDirectasComponentes.{{ $itemPlanId }}.{{ $componenteR->id }}.nota"
+                                                                        placeholder="Ej: 17.50">
+                                                                    @error('notasDirectasComponentes.' . $itemPlanId . '.' . $componenteR->id . '.nota')
+                                                                        <span class="invalid-feedback">{{ $message }}</span>
+                                                                    @enderror
+                                                                    <small class="text-muted">
+                                                                        Ingrese la nota promedio de los calificadores generales
+                                                                    </small>
+                                                                </div>
+                                                                <div class="col-md-8 mb-3">
+                                                                    <label for="obs_comp_{{ $itemPlanId }}_{{ $componenteR->id }}" class="form-label fw-semibold">
+                                                                        <i class="bi bi-chat-left-text me-1"></i>Observación (Opcional)
+                                                                    </label>
+                                                                    <textarea
+                                                                        class="form-control @error('notasDirectasComponentes.' . $itemPlanId . '.' . $componenteR->id . '.observacion') is-invalid @enderror"
+                                                                        id="obs_comp_{{ $itemPlanId }}_{{ $componenteR->id }}" rows="2"
+                                                                        wire:model.defer="notasDirectasComponentes.{{ $itemPlanId }}.{{ $componenteR->id }}.observacion"
+                                                                        placeholder="Ingrese comentarios adicionales..."></textarea>
+                                                                    @error('notasDirectasComponentes.' . $itemPlanId . '.' . $componenteR->id . '.observacion')
+                                                                        <span class="invalid-feedback">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                        {{-- Mostrar rúbrica normal con criterios --}}
                                                         <div class="table-responsive">
                                                             <table class="table table-bordered table-rubrica-calificacion align-middle">
                                                                 <thead style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
@@ -550,6 +593,7 @@
                                                                 </tbody>
                                                             </table>
                                                         </div>
+                                                        @endif {{-- Fin @else de $esNotaDirectaCalificadores --}}
                                                     </div>
                                                 @endif
                                             @endforeach

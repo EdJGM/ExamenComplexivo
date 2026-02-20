@@ -1,11 +1,7 @@
-* text=auto
+# Asegurar que archivos de shell siempre usen LF
+*.sh text eol=lf
 
-*.blade.php diff=html
-*.css diff=css
-*.html diff=html
-*.md diff=markdown
-*.php diff=php
-
-/.github export-ignore
-CHANGELOG.md export-ignore
-.styleci.yml export-ignore
+# Asegurar que archivos de configuración de Docker usen LF
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf

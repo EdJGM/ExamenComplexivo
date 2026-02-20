@@ -218,7 +218,16 @@ class TribunalProfile extends Component
         foreach ($calificacionItemRubricaMiembro['componentes_evaluados'] as $datosComp) {
             $html .= '<div class="mb-1 border-bottom pb-1">';
             $html .= '<small><strong>' . htmlspecialchars($datosComp['nombre_componente_rubrica'] ?? '', ENT_QUOTES) . ':</strong></small>';
-            if (isset($datosComp['criterios_evaluados']) && !empty($datosComp['criterios_evaluados'])) {
+
+            // Verificar si es un componente con nota directa
+            if (isset($datosComp['es_nota_directa']) && $datosComp['es_nota_directa']) {
+                $html .= '<p class="ms-2 mb-0"><small>';
+                $html .= '<strong>Nota Directa:</strong> <em>' . htmlspecialchars($datosComp['nota_directa'] ?? 'N/R', ENT_QUOTES) . '/20</em>';
+                if (!empty($datosComp['observacion'])) {
+                    $html .= '<br><span class="text-muted" style="font-size: 0.9em;">Obs: ' . htmlspecialchars($datosComp['observacion'], ENT_QUOTES) . '</span>';
+                }
+                $html .= '</small></p>';
+            } elseif (isset($datosComp['criterios_evaluados']) && !empty($datosComp['criterios_evaluados'])) {
                 $html .= '<ul class="list-unstyled ps-2 mb-0">';
                 foreach ($datosComp['criterios_evaluados'] as $datosCrit) {
                     $html .= '<li><small>';
@@ -481,6 +490,36 @@ class TribunalProfile extends Component
                     if (!$componenteRubrica) continue;
 
                     $grupoCalificadorResponsable = $asignacion->calificado_por;
+
+                    // NUEVO: Manejo de DIRECTOR_NOTA_CALIFICADORES
+                    // El Director/Apoyo ingresa directamente una nota (0-20) para este componente
+                    if ($grupoCalificadorResponsable === 'DIRECTOR_NOTA_CALIFICADORES') {
+                        // Buscar la nota directa del componente ingresada por Director o Apoyo
+                        $califNotaDirectaComponente = $calificacionesParaEsteItem
+                            ->whereIn('user_id', array_filter([$directorId, $apoyoId]))
+                            ->where('componente_rubrica_id', $componenteRubrica->id)
+                            ->whereNull('criterio_id')
+                            ->first();
+
+                        if ($califNotaDirectaComponente && is_numeric($califNotaDirectaComponente->nota_obtenida_directa)) {
+                            // La nota está sobre 20, convertir a escala del componente (0-ponderacion_componente)
+                            $notaSobre20 = (float) $califNotaDirectaComponente->nota_obtenida_directa;
+                            $notaEnEscalaComponente = ($notaSobre20 / 20) * $componenteRubrica->ponderacion;
+
+                            if (!isset($notasRubricaPorGrupoCalificador[$grupoCalificadorResponsable])) {
+                                $notasRubricaPorGrupoCalificador[$grupoCalificadorResponsable] = [];
+                            }
+                            // Guardar la nota directamente (sin promediar, ya que es una sola nota)
+                            $notasRubricaPorGrupoCalificador[$grupoCalificadorResponsable][$componenteRubrica->id] = $notaEnEscalaComponente;
+
+                            // Guardar observación si existe
+                            if (!empty($califNotaDirectaComponente->observacion)) {
+                                $observacionesGeneralesRubrica[$califNotaDirectaComponente->user_id] = $califNotaDirectaComponente->observacion;
+                            }
+                        }
+                        continue; // Saltar la lógica de rúbrica normal para este componente
+                    }
+
                     $idsUsuariosDeEsteGrupo = [];
 
                     if ($grupoCalificadorResponsable === 'MIEMBROS_TRIBUNAL') {
@@ -502,7 +541,7 @@ class TribunalProfile extends Component
                         $calificacionesDelUsuarioParaItem = $calificacionesParaEsteItem->where('user_id', $userIdCalificador);
 
                         // Observación general del ítem de rúbrica por este usuario
-                        $obsGeneral = $calificacionesDelUsuarioParaItem->whereNull('criterio_id')->first();
+                        $obsGeneral = $calificacionesDelUsuarioParaItem->whereNull('criterio_id')->whereNull('componente_rubrica_id')->first();
                         if ($obsGeneral && !empty($obsGeneral->observacion)) {
                             $observacionesGeneralesRubrica[$userIdCalificador] = $obsGeneral->observacion;
                         }
@@ -639,29 +678,51 @@ class TribunalProfile extends Component
                             if ($asignacionComp->calificado_por === 'CALIFICADORES_GENERALES' && $calificadoresGeneralesUsers->contains('id', $calificadorUser->id)) $debiaCalificarEsteComponente = true;
                             if ($asignacionComp->calificado_por === 'DIRECTOR_CARRERA' && $calificadorUser->id == $directorId) $debiaCalificarEsteComponente = true;
                             if ($asignacionComp->calificado_por === 'DOCENTE_APOYO' && $calificadorUser->id == $apoyoId) $debiaCalificarEsteComponente = true;
+                            // DIRECTOR_NOTA_CALIFICADORES: Solo mostrar Director, no Apoyo
+                            if ($asignacionComp->calificado_por === 'DIRECTOR_NOTA_CALIFICADORES' && $calificadorUser->id == $directorId) $debiaCalificarEsteComponente = true;
                         }
 
                         if ($debiaCalificarEsteComponente) { // Solo mostrar si este usuario debía calificarlo
-                            $criteriosEvaluadosArray = [];
-                            foreach ($componenteR->criteriosComponente as $criterioR) {
-                                $califCriterioDelMiembro = $susCalificacionesGuardadas
+                            // Verificar si es un componente con nota directa (DIRECTOR_NOTA_CALIFICADORES)
+                            if ($asignacionComp && $asignacionComp->calificado_por === 'DIRECTOR_NOTA_CALIFICADORES') {
+                                // Buscar la nota directa del componente
+                                $califNotaDirectaComponente = $susCalificacionesGuardadas
                                     ->where('item_plan_evaluacion_id', $itemPlan->id)
-                                    ->where('criterio_id', $criterioR->id)
+                                    ->where('componente_rubrica_id', $componenteR->id)
+                                    ->whereNull('criterio_id')
                                     ->first();
 
-                                $opcionElegida = $califCriterioDelMiembro ? $califCriterioDelMiembro->opcionCalificacionElegida : null;
+                                $datosItemRubrica['componentes_evaluados'][$componenteR->id] = [
+                                    'nombre_componente_rubrica' => $componenteR->nombre,
+                                    'es_nota_directa' => true,
+                                    'nota_directa' => $califNotaDirectaComponente?->nota_obtenida_directa ?? null,
+                                    'observacion' => $califNotaDirectaComponente?->observacion ?? '',
+                                    'criterios_evaluados' => [], // Vacío para componentes de nota directa
+                                ];
+                            } else {
+                                // Componente con criterios normales
+                                $criteriosEvaluadosArray = [];
+                                foreach ($componenteR->criteriosComponente as $criterioR) {
+                                    $califCriterioDelMiembro = $susCalificacionesGuardadas
+                                        ->where('item_plan_evaluacion_id', $itemPlan->id)
+                                        ->where('criterio_id', $criterioR->id)
+                                        ->first();
 
-                                $criteriosEvaluadosArray[$criterioR->id] = [
-                                    'nombre_criterio_rubrica' => $criterioR->nombre,
-                                    'calificacion_elegida_nombre' => $opcionElegida?->nombre ?? null,
-                                    'calificacion_elegida_valor' => $opcionElegida?->valor ?? null,
-                                    'observacion' => $califCriterioDelMiembro?->observacion ?? '',
+                                    $opcionElegida = $califCriterioDelMiembro ? $califCriterioDelMiembro->opcionCalificacionElegida : null;
+
+                                    $criteriosEvaluadosArray[$criterioR->id] = [
+                                        'nombre_criterio_rubrica' => $criterioR->nombre,
+                                        'calificacion_elegida_nombre' => $opcionElegida?->nombre ?? null,
+                                        'calificacion_elegida_valor' => $opcionElegida?->valor ?? null,
+                                        'observacion' => $califCriterioDelMiembro?->observacion ?? '',
+                                    ];
+                                }
+                                $datosItemRubrica['componentes_evaluados'][$componenteR->id] = [
+                                    'nombre_componente_rubrica' => $componenteR->nombre,
+                                    'es_nota_directa' => false,
+                                    'criterios_evaluados' => $criteriosEvaluadosArray,
                                 ];
                             }
-                            $datosItemRubrica['componentes_evaluados'][$componenteR->id] = [
-                                'nombre_componente_rubrica' => $componenteR->nombre,
-                                'criterios_evaluados' => $criteriosEvaluadosArray,
-                            ];
                         }
                     }
                     // Solo añadir al array si tiene componentes evaluados (es decir, si este usuario calificó algo de esta rúbrica)

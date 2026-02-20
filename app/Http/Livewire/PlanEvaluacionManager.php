@@ -36,8 +36,9 @@ class PlanEvaluacionManager extends Component
     ];
 
     public $opcionesCalificadoPorComponenteRubricaFiltradas = [
-        'MIEMBROS_TRIBUNAL'       => 'Miembros del Tribunal',
-        'CALIFICADORES_GENERALES' => 'Calificadores Generales',
+        'MIEMBROS_TRIBUNAL'           => 'Miembros del Tribunal',
+        'CALIFICADORES_GENERALES'     => 'Calificadores Generales',
+        'DIRECTOR_NOTA_CALIFICADORES' => 'Director (Nota Calificadores)',
     ];
     const CALIFICADO_POR_NOTA_DIRECTA_DEFAULT = 'DIRECTOR_CARRERA';
 
